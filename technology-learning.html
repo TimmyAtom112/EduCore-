@@ -199,7 +199,7 @@ async function loadTechnologyTopics() {
             <h3>${topic.title}</h3>
             <p>${topic.description || ""}</p>
             <span class="difficulty">${topic.difficulty}</span><br>
-            <a href="#" class="explore-btn">Explore Topic</a>
+            <a href="beyond-topic.html?id=${topic.id}" class="explore-btn">Explore Topic</a>
         </div>
     `).join("");
 }
