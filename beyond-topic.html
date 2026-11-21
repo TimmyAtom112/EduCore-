@@ -203,7 +203,12 @@
 
     </div>
 
-    <div id="tutorResponse" style="margin-top:20px;"></div>
+    <div id="tutorResponse" style="margin-top:20px;">
+    </div>
+    <div id="tutorStatus"
+     style="margin-top:10px; color:#64748b; font-size:13px;">
+    EduCore AI Tutor is ready to assist you.
+</div>
 
 </section>
 
@@ -227,6 +232,10 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
+let currentBeyondTopic = null;
+let currentStudentClass = "";
+let beyondTutorHistory = [];
+
 async function loadTopic() {
     const params = new URLSearchParams(window.location.search);
     const topicId = params.get("id");
@@ -243,6 +252,15 @@ async function loadTopic() {
         await supabaseClient.auth.getUser();
 
     const user = authData?.user;
+    if (user) {
+    const { data: studentProfile } = await supabaseClient
+        .from("student_profiles")
+        .select("class_level")
+        .eq("id", user.id)
+        .single();
+
+    currentStudentClass = studentProfile?.class_level || "";
+}
 
     if (authError || !user) {
         window.location.href = "student-auth.html";
@@ -270,7 +288,7 @@ async function loadTopic() {
         console.error(error);
         return;
     }
-
+    currentBeyondTopic = topic;
     document.getElementById("topicTitle").textContent = topic.title;
     document.getElementById("topicDescription").textContent =
         topic.description || "";
@@ -357,31 +375,97 @@ document.getElementById("generateLessonBtn").addEventListener("click", function 
 
 });
     
-document.getElementById("askTutorBtn").addEventListener("click", function () {
+
+document.getElementById("askTutorBtn").addEventListener("click", async function () {
 
     const question = document.getElementById("tutorQuestion").value.trim();
     const response = document.getElementById("tutorResponse");
+    const status = document.getElementById("tutorStatus");
+    const button = document.getElementById("askTutorBtn");
 
     if (!question) {
-        response.textContent = "Please enter a question first.";
+        status.textContent = "Please enter a question first.";
         return;
     }
 
-    response.innerHTML = `
-        <div style="background:#EAF5FF; padding:16px; border-radius:10px;">
-            <strong>Your question:</strong>
-            <p></p>
-            <p style="margin-top:12px; color:#64748b;">
-                EduCore AI Tutor connection is being prepared.
-                Your question will be answered when the AI service
-                is connected.
-            </p>
-        </div>
-    `;
+    if (!currentBeyondTopic) {
+        status.textContent = "Topic information is not ready. Please refresh.";
+        return;
+    }
 
-    response.querySelector("p").textContent = question;
+    button.disabled = true;
+    button.textContent = "Sending...";
+    status.textContent = "Connecting to EduCore AI Tutor...";
+
+    response.innerHTML = "";
+
+    try {
+    
+    const conversationHistory = [
+    ...beyondTutorHistory,
+    {
+        role: "user",
+        content: question
+    }
+];
+        const tutorRequest = {
+            question: question,
+            class_level: currentStudentClass,
+            subject: "Technology & Digital Skills",
+            learning_mode: "question",
+            conversation_history: conversationHistory,
+            
+            curriculum_context: {
+                topic: currentBeyondTopic.title,
+                description: currentBeyondTopic.description,
+                subtopics: currentBeyondTopic.subtopics,
+                learning_objectives: currentBeyondTopic.learning_objectives,
+                teaching_style: "Use simple explanations and familiar Nigerian examples."
+            }
+        };
+
+        const { data, error } = await supabaseClient.functions.invoke(
+            "Student-Tutor",
+            {
+                body: tutorRequest
+            }
+        );
+
+        if (error) throw error;
+        beyondTutorHistory = conversationHistory;
+
+        response.innerHTML = `
+            <div style="background:#EAF5FF; padding:16px; border-radius:10px;">
+                <strong>Your question:</strong>
+                <p id="submittedQuestion"></p>
+                <p style="margin-top:12px;">
+                    Your question has reached the EduCore AI Tutor backend.
+                </p>
+                <p style="font-size:13px; color:#64748b; margin-top:8px;">
+                    AI answer generation will be activated when API credits are available.
+                </p>
+            </div>
+        `;
+
+        document.getElementById("submittedQuestion").textContent = question;
+
+        status.textContent = "Successfully connected to the EduCore AI Tutor backend.";
+
+        console.log("Student-Tutor response:", data);
+
+    } catch (error) {
+        console.error("Tutor connection error:", error);
+
+        status.textContent =
+            "Unable to connect. Please check your connection and try again.";
+
+    } finally {
+        button.disabled = false;
+        button.textContent = "Send Question →";
+    }
 
 });
+
 
 </script>
 
