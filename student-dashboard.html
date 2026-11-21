@@ -269,6 +269,64 @@ footer {
         </div>
 
     </section>
+    
+    <div style="margin-top: 20px; margin-bottom: 30px;">
+    <button id="editProfileBtn" class="feature-btn">
+        ✏️ Edit My Profile
+    </button>
+</div>
+
+    <section id="editProfileSection" class="learning-card" style="display: none; margin-bottom: 30px;">
+
+    <h2>Edit My Profile</h2>
+
+    <form id="editProfileForm">
+
+        <label for="editFullName">Full Name</label>
+        <input
+            type="text"
+            id="editFullName"
+            required
+        >
+
+        <label for="editClass">Class Level</label>
+        <select id="editClass" required>
+            <option value="JSS1">JSS1</option>
+            <option value="JSS2">JSS2</option>
+            <option value="JSS3">JSS3</option>
+            <option value="SS1">SS1</option>
+            <option value="SS2">SS2</option>
+            <option value="SS3">SS3</option>
+        </select>
+
+        <label>Preferred Subjects</label>
+
+        <div id="editSubjects">
+
+            <label><input type="checkbox" value="Mathematics"> Mathematics</label>
+            <label><input type="checkbox" value="English"> English</label>
+            <label><input type="checkbox" value="Digital Technology"> Digital Technology</label>
+            <label><input type="checkbox" value="Biology"> Biology</label>
+            <label><input type="checkbox" value="Chemistry"> Chemistry</label>
+            <label><input type="checkbox" value="Physics"> Physics</label>
+            <label><input type="checkbox" value="Economics"> Economics</label>
+            <label><input type="checkbox" value="Geography"> Geography</label>
+
+        </div>
+
+        <button type="submit" class="feature-btn">
+            Save Changes
+        </button>
+
+        <button type="button" id="cancelEditBtn" class="feature-btn">
+            Cancel
+        </button>
+
+        <p id="profileMessage"></p>
+
+    </form>
+
+</section>
 
 
     <!-- LEARNING TOOLS -->
@@ -403,6 +461,7 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
+let currentStudentProfile = null;
 
 // LOAD STUDENT PROFILE
 
@@ -461,7 +520,7 @@ async function loadStudentProfile() {
 
     }
 
-
+    currentStudentProfile = data;
     document.getElementById("studentName").textContent =
         data.full_name;
 
@@ -519,6 +578,112 @@ document.getElementById("year").textContent =
 
 loadStudentProfile();
 
+// OPEN EDIT PROFILE FORM
+document.getElementById("editProfileBtn").addEventListener("click", function () {
+
+    if (!currentStudentProfile) {
+        alert("Your profile is not available yet.");
+        return;
+    }
+
+    document.getElementById("editProfileSection").style.display = "block";
+
+    document.getElementById("editFullName").value =
+        currentStudentProfile.full_name;
+
+    document.getElementById("editClass").value =
+        currentStudentProfile.class_level;
+
+    document.querySelectorAll("#editSubjects input").forEach(input => {
+
+        input.checked =
+            currentStudentProfile.subjects.includes(input.value);
+
+    });
+
+    document.getElementById("editProfileSection").scrollIntoView({
+        behavior: "smooth"
+    });
+
+});
+
+
+// CANCEL EDITING
+document.getElementById("cancelEditBtn").addEventListener("click", function () {
+
+    document.getElementById("editProfileSection").style.display = "none";
+
+});
+
+// SAVE UPDATED STUDENT PROFILE
+document.getElementById("editProfileForm").addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const fullName = document.getElementById("editFullName").value.trim();
+    const classLevel = document.getElementById("editClass").value;
+
+    const subjects = Array.from(
+        document.querySelectorAll("#editSubjects input:checked")
+    ).map(input => input.value);
+
+    const message = document.getElementById("profileMessage");
+
+    if (!fullName) {
+        message.textContent = "Please enter your full name.";
+        return;
+    }
+
+    if (subjects.length === 0) {
+        message.textContent = "Please select at least one subject.";
+        return;
+    }
+
+    message.textContent = "Saving your changes...";
+
+    const { data, error } = await supabaseClient
+        .from("student_profiles")
+        .update({
+            full_name: fullName,
+            class_level: classLevel,
+            subjects: subjects
+        })
+        .eq("id", currentStudentProfile.id)
+        .select()
+        .single();
+
+    if (error) {
+    console.error("Profile update error:", JSON.stringify(error, null, 2));
+
+    message.textContent =
+        error.message || "Unable to save changes.";
+
+    return;
+}
+
+    currentStudentProfile = data;
+
+    document.getElementById("studentName").textContent = data.full_name;
+    document.getElementById("studentClass").textContent = data.class_level;
+
+    const subjectsContainer = document.getElementById("studentSubjects");
+    subjectsContainer.innerHTML = "";
+
+    data.subjects.forEach(subject => {
+        const tag = document.createElement("span");
+        tag.className = "subject-tag";
+        tag.textContent = subject;
+        subjectsContainer.appendChild(tag);
+    });
+
+    message.textContent = "Profile updated successfully!";
+
+    setTimeout(() => {
+        document.getElementById("editProfileSection").style.display = "none";
+        message.textContent = "";
+    }, 1500);
+
+});
 </script>
 
 </body>
