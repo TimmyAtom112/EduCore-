@@ -447,6 +447,23 @@
                 transform: translateY(-5px);
             }
         }
+        
+       .message-time {
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 6px;
+    text-align: right;
+    opacity: 0.8;
+}
+
+.student-message .message-time {
+    color: #dbeafe;
+}
+
+.tutor-message .message-time {
+    color: #64748b;
+}
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -685,12 +702,24 @@
 
                 await loadConversationHistory();
             }
+           function addMessageTimestamp(bubble) {
+    const timestamp = document.createElement("small");
+
+    timestamp.className = "message-time";
+    timestamp.textContent = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+
+    bubble.appendChild(timestamp);
+} 
 
             // DISPLAY STUDENT MESSAGE
             const studentBubble = document.createElement("div");
             studentBubble.className = "student-message";
             studentBubble.textContent = question;
-
+            
+            addMessageTimestamp(studentBubble);
             chatMessages.appendChild(studentBubble);
             studentQuestion.value = "";
 
@@ -771,7 +800,8 @@
 
             tutorBubble.appendChild(tutorName);
             tutorBubble.appendChild(tutorText);
-
+            
+            addMessageTimestamp(tutorBubble);
             chatMessages.appendChild(tutorBubble);
 
             // SAVE TUTOR RESPONSE
