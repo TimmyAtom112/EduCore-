@@ -733,7 +733,6 @@ if (backendResult) {
 
 responseText +=
     " Real AI-generated answers will be activated when API credit is available.";
-
 tutorText.textContent = responseText;
 
 tutorBubble.appendChild(tutorName);
@@ -778,7 +777,10 @@ async function sendTutorRequest(tutorRequest) {
 }
 
 
-sendQuestion.addEventListener("click", sendMessage);
+sendQuestion.onclick = function(event) {
+    event.preventDefault();
+    sendMessage();
+};
 
 // Allow Enter to send, Shift + Enter for a new line
 studentQuestion.addEventListener("keydown", function(event) {
