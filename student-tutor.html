@@ -638,18 +638,7 @@ let currentStudentId = null;
 // STORE SELECTED CURRICULUM CONTEXT
 let selectedCurriculumContext = null;
 
-async function sendMessage() {
-
-    const question = studentQuestion.value.trim();
-    const tutorRequest = {
-    question: question,
-    class_level: document.getElementById("tutorClass").value,
-    subject: document.getElementById("tutorSubject").value,
-    learning_mode: document.querySelector(".mode-btn.active")?.dataset.mode || "explain",
-    curriculum_context: selectedCurriculumContext
-};
-
-    if (!question) {
+if (!question) {
         alert("Please enter a question first.");
         return;
     }
@@ -769,6 +758,35 @@ if (tutorMessageError) {
     // Scroll to latest message
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
+
+async function sendTutorRequest(tutorRequest) {
+
+    const { data, error } = await supabaseClient.functions.invoke(
+        "Student-Tutor",
+        {
+            body: tutorRequest
+        }
+    );
+
+    if (error) {
+        console.error("Tutor backend error:", error);
+        return null;
+    }
+
+    return data;
+}
+
+
+sendQuestion.addEventListener("click", sendMessage);
+
+// Allow Enter to send, Shift + Enter for a new line
+studentQuestion.addEventListener("keydown", function(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
+});
 
 
 async function sendTutorRequest(tutorRequest) {
