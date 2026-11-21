@@ -451,7 +451,10 @@ document.getElementById("askTutorBtn").addEventListener("click", async function 
 
         status.textContent = "Successfully connected to the EduCore AI Tutor backend.";
 
-        console.log("Student-Tutor response:", data);
+        console.log(
+    "Student-Tutor response:",
+    JSON.stringify(data, null, 2)
+);
 
     } catch (error) {
         console.error("Tutor connection error:", error);
