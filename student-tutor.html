@@ -967,7 +967,24 @@ document.getElementById("newConversation")
         studentQuestion.value = "";
 
     });
-    
+
+  // CLEAR CHAT (KEEP SAVED CONVERSATION)
+document.getElementById("clearChat").addEventListener("click", function() {
+
+    if (!confirm("Clear the messages from this screen? Your conversation will remain saved in history.")) {
+        return;
+    }
+
+    chatMessages.innerHTML = `
+        <div class="tutor-message">
+            <strong>EduCore Tutor</strong>
+            <p>Your chat screen has been cleared. You can continue learning whenever you're ready! 👋</p>
+        </div>
+    `;
+
+    studentQuestion.value = "";
+
+});
     
 // LOAD CURRICULUM TOPICS
 async function loadTutorTopics() {
