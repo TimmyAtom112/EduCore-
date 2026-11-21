@@ -272,6 +272,42 @@
     margin-top: 6px;
 }
 
+.history-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#clearChat,
+#newConversation {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+#clearChat {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+#clearChat:hover {
+    background: #fecaca;
+}
+
+@media (max-width: 600px) {
+    .history-heading {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .history-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+}
+
 @media (max-width: 500px) {
     .history-heading {
         align-items: flex-start;
