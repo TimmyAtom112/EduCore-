@@ -803,6 +803,7 @@
             
             addMessageTimestamp(tutorBubble);
             chatMessages.appendChild(tutorBubble);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
 
             // SAVE TUTOR RESPONSE
             const { error: tutorMessageError } =
@@ -822,13 +823,41 @@
 
         } catch (error) {
 
-            console.error("Send message error:", error);
+    console.error("Send message error:", error);
 
-            alert(
-                "Something went wrong while sending your message. Please try again."
-            );
+    const errorBubble = document.createElement("div");
+    errorBubble.className = "tutor-message";
 
-        } finally {
+    const errorText = document.createElement("p");
+    errorText.textContent =
+        "Your message couldn't be sent. Please check your connection and try again.";
+
+    const retryButton = document.createElement("button");
+    retryButton.textContent = "↻ Retry";
+    retryButton.type = "button";
+    retryButton.style.marginTop = "10px";
+    retryButton.style.padding = "8px 14px";
+    retryButton.style.border = "none";
+    retryButton.style.borderRadius = "6px";
+    retryButton.style.background = "#2196F3";
+    retryButton.style.color = "#fff";
+    retryButton.style.cursor = "pointer";
+
+    retryButton.addEventListener("click", function () {
+        errorBubble.remove();
+        studentQuestion.value = question;
+        sendMessage();
+    });
+
+    errorBubble.appendChild(errorText);
+    errorBubble.appendChild(retryButton);
+
+    chatMessages.appendChild(errorBubble);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+} 
+
+finally {
 
             if (typingIndicator) {
                 typingIndicator.remove();
@@ -1089,6 +1118,7 @@
             }
 
             chatMessages.appendChild(bubble);
+            chatMessages.scrollTop =            chatMessages.scrollHeight;
 
         });
 
