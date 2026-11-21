@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduCore | Teacher Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #F1F6FB;
+            color: #102A43;
+        }
+
+        header {
+            background: #102A43;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #42A5F5;
+        }
+
+        .logout-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: auto;
+            padding: 35px 20px;
+        }
+
+        .welcome {
+            margin-bottom: 30px;
+        }
+
+        .welcome h1 {
+            font-size: 27px;
+            margin-bottom: 10px;
+        }
+
+        .welcome p {
+            color: #627D98;
+            line-height: 1.6;
+        }
+
+        .profile-card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        }
+
+        .profile-card h2 {
+            margin-bottom: 18px;
+            font-size: 19px;
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .detail label {
+            display: block;
+            color: #829AB1;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .detail p {
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .section-title {
+            margin-bottom: 18px;
+        }
+
+        .tools {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .tool-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        }
+
+        .tool-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .tool-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .tool-card p {
+            color: #627D98;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .tool-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 11px 17px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .tool-btn {
+    display: inline-block;
+    text-decoration: none;
+}
+
+        .coming-soon {
+            display: inline-block;
+            background: #EAF5FF;
+            color: #1976D2;
+            font-size: 12px;
+            padding: 5px 9px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #829AB1;
+            font-size: 13px;
+        }
+
+        @media(max-width: 650px) {
+            .tools,
+            .profile-details {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 16px 5%;
+            }
+
+            .welcome h1 {
+                font-size: 23px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Edu<span>Core</span></div>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+</header>
+
+<main>
+
+    <section class="welcome">
+        <h1>Welcome, <span id="teacherName">Teacher</span>! 👋</h1>
+        <p>
+            Your teaching workspace is ready.
+            Let's make teaching and learning more effective.
+        </p>
+    </section>
+
+    <section class="profile-card">
+
+        <h2>My Teaching Profile</h2>
+
+        <div class="profile-details">
+
+            <div class="detail">
+                <label>Full Name</label>
+                <p id="profileName">Loading...</p>
+            </div>
+
+            <div class="detail">
+                <label>School</label>
+                <p id="profileSchool">Loading...</p>
+            </div>
+
+            <div class="detail">
+                <label>Teaching Level</label>
+                <p id="profileLevel">Loading...</p>
+            </div>
+
+            <div class="detail">
+                <label>Subjects</label>
+                <p id="profileSubjects">Loading...</p>
+            </div>
+
+        </div>
+
+    </section>
+
+    <h2 class="section-title">Your Teaching Tools</h2>
+
+    <section class="tools">
+
+        <div class="tool-card">
+
+            <div class="tool-icon">📚</div>
+
+            <span class="coming-soon">Coming Soon</span>
+
+            <h3>AI Lesson Planner</h3>
+
+            <p>
+                Generate structured lesson plans, lesson notes,
+                teaching objectives and classroom activities.
+            </p>
+
+            <a href="lesson-planner.html" class="tool-btn">
+    Open Lesson Planner
+</a>
+
+        </div>
+
+        <div class="tool-card">
+
+            <div class="tool-icon">👤</div>
+
+            <h3>My Profile</h3>
+
+            <p>
+                View your teaching information and the
+                details associated with your EduCore account.
+            </p>
+
+            <button class="tool-btn" id="viewProfileBtn">
+                View Profile
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    EduCore © 2026 | Empowering Teachers. Inspiring Learners.
+</footer>
+
+<script>
+
+// SUPABASE CONNECTION
+
+const SUPABASE_URL = "https://xpcumdfehmfbxxycpghg.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_D42fTNuZmLQcExVgb9tCmw_wtfnzwc1";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+// LOAD TEACHER PROFILE
+
+async function loadTeacherProfile() {
+
+    const { data: { user }, error: authError } =
+        await supabaseClient.auth.getUser();
+
+    if (authError || !user) {
+        window.location.href = "teacher-auth.html";
+        return;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("teacher_profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+    if (error) {
+        alert("Unable to load your profile: " + error.message);
+        return;
+    }
+
+    document.getElementById("teacherName").textContent =
+        data.full_name;
+
+    document.getElementById("profileName").textContent =
+        data.full_name;
+
+    document.getElementById("profileSchool").textContent =
+        data.school_name || "Not provided";
+
+    document.getElementById("profileLevel").textContent =
+        data.teaching_level;
+
+    document.getElementById("profileSubjects").textContent =
+        data.subjects || "Not provided";
+}
+
+
+// VIEW PROFILE
+
+document.getElementById("viewProfileBtn")
+.addEventListener("click", () => {
+
+    document.querySelector(".profile-card")
+    .scrollIntoView({ behavior: "smooth" });
+
+});
+
+
+// LOGOUT
+
+document.getElementById("logoutBtn")
+.addEventListener("click", async () => {
+
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+        alert("Logout failed: " + error.message);
+        return;
+    }
+
+    window.location.href = "teacher-auth.html";
+
+});
+
+
+// START
+
+loadTeacherProfile();
+
+</script>
+
+</body>
+</html>

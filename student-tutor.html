@@ -1,0 +1,1120 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Student Tutor | EduCore</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #EAF5FF;
+            color: #102A43;
+        }
+
+        header {
+            background: #102A43;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 25px;
+            color: #2196F3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .chat-card {
+    background: white;
+    margin-top: 30px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+}
+
+.chat-header {
+    background: #F1F8FF;
+    padding: 22px;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.chat-header h3 {
+    margin-bottom: 8px;
+}
+
+.chat-header p {
+    color: #627D98;
+    font-size: 14px;
+}
+
+.chat-messages {
+    min-height: 300px;
+    max-height: 450px;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.tutor-message {
+    background: #EAF5FF;
+    padding: 15px;
+    border-radius: 12px;
+    max-width: 85%;
+    margin-bottom: 15px;
+}
+
+.tutor-message strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #2196F3;
+}
+
+.tutor-message p {
+    line-height: 1.6;
+}
+
+.student-message {
+    background: #102A43;
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    max-width: 85%;
+    margin: 15px 0 15px auto;
+    line-height: 1.6;
+}
+
+.chat-input-area {
+    display: flex;
+    gap: 10px;
+    padding: 18px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.chat-input-area textarea {
+    flex: 1;
+    padding: 13px;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    resize: vertical;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+}
+
+.chat-input-area button {
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.chat-input-area button:hover {
+    background: #1976D2;
+}
+
+@media (max-width: 600px) {
+    .chat-input-area {
+        flex-direction: column;
+    }
+
+    .chat-input-area button {
+        width: 100%;
+    }
+}
+
+    .tutor-settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 25px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.tutor-settings label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.tutor-settings select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    background: white;
+    font-size: 15px;
+    color: #102A43;
+}
+
+.tutor-settings select:focus {
+    outline: 2px solid #2196F3;
+    border-color: #2196F3;
+}
+
+@media (max-width: 600px) {
+    .tutor-settings {
+        grid-template-columns: 1fr;
+    }
+}    
+    
+    .learning-modes {
+    margin-top: 25px;
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+}
+
+.learning-modes h3 {
+    margin-bottom: 18px;
+}
+
+.mode-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.mode-btn {
+    padding: 16px 10px;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    background: #F8FAFC;
+    color: #102A43;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.mode-btn:hover {
+    border-color: #2196F3;
+    background: #EAF5FF;
+}
+
+.mode-btn.active {
+    background: #2196F3;
+    color: white;
+    border-color: #2196F3;
+}
+
+#selectedMode {
+    margin-top: 15px;
+    color: #627D98;
+    font-size: 14px;
+}
+
+@media (max-width: 600px) {
+    .mode-options {
+        grid-template-columns: 1fr;
+    }
+}
+    
+    .conversation-history {
+    background: white;
+    padding: 20px;
+    margin-top: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+}
+
+.history-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+#newConversation {
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 11px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.conversation-item {
+    padding: 14px;
+    border: 1px solid #E5E7EB;
+    border-radius: 9px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.conversation-item:hover {
+    background: #EAF5FF;
+    border-color: #2196F3;
+}
+
+.conversation-item p {
+    color: #627D98;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+@media (max-width: 500px) {
+    .history-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+    .topic-selector {
+    background: white;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 12px;
+}
+
+.topic-selector label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.topic-selector select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font-size: 15px;
+    background: white;
+    color: #102A43;
+}
+
+.topic-selector p {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #627D98;
+    line-height: 1.5;
+}
+
+    .curriculum-context {
+    background: white;
+    padding: 22px;
+    margin-top: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+}
+
+.curriculum-context h3 {
+    margin-bottom: 12px;
+    color: #102A43;
+}
+
+#contextMessage {
+    color: #627D98;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.context-section {
+    padding: 15px 0;
+    border-top: 1px solid #E5E7EB;
+}
+
+.context-section h4 {
+    margin-bottom: 10px;
+    color: #2196F3;
+}
+
+.context-section p,
+.context-section li {
+    line-height: 1.7;
+    color: #334E68;
+    font-size: 14px;
+}
+
+.context-section ul {
+    padding-left: 22px;
+}
+
+    </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+    const SUPABASE_URL = "https://xpcumdfehmfbxxycpghg.supabase.co";
+
+    const SUPABASE_KEY = "sb_publishable_D42fTNuZmLQcExVgb9tCmw_wtfnzwc1";
+
+    const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+</script>
+    
+</head>
+
+<body>
+
+    <header>
+        <h2>EduCore</h2>
+        <p>AI Student Tutor</p>
+    </header>
+
+    <main class="container">
+
+        <a href="student-dashboard.html" class="back-link">
+            ← Back to Dashboard
+        </a>
+
+        <h2>Learn with Your AI Tutor</h2>
+
+<p>
+    Ask questions, understand difficult topics,
+    and explore new ideas at your own pace.
+</p>
+
+<div class="tutor-settings">
+
+    <div>
+        <label for="tutorClass">Select Your Class</label>
+        <select id="tutorClass">
+            <option value="">Choose class</option>
+            <option value="JSS1">JSS1</option>
+            <option value="JSS2">JSS2</option>
+            <option value="JSS3">JSS3</option>
+            <option value="SS1">SS1</option>
+            <option value="SS2">SS2</option>
+            <option value="SS3">SS3</option>
+        </select>
+    </div>
+    
+
+    <div>
+        <label for="tutorSubject">Select Subject</label>
+        <select id="tutorSubject">
+            <option value="">Choose subject</option>
+            <option value="Mathematics">Mathematics</option>
+            <option value="English Language">English Language</option>
+            <option value="Digital Technology">Digital Technology</option>
+            <option value="Biology">Biology</option>
+            <option value="Chemistry">Chemistry</option>
+            <option value="Physics">Physics</option>
+            <option value="Economics">Economics</option>
+            <option value="Geography">Geography</option>
+        </select>
+    </div>
+
+</div>
+
+<div class="topic-selector">
+
+    <label for="tutorTopic">
+        Select a Topic (Optional)
+    </label>
+
+    <select id="tutorTopic">
+        <option value="">Choose a topic to study</option>
+    </select>
+
+    <p>
+        Choose a curriculum topic to help your tutor
+        understand exactly what you are studying.
+    </p>
+
+</div>
+    
+    <section class="curriculum-context" id="curriculumContext">
+
+    <h3>📚 Your Learning Guide</h3>
+
+    <p id="contextMessage">
+        Select a curriculum topic to see its learning guide.
+    </p>
+
+    <div id="contextDetails"></div>
+
+</section>
+    
+    <section class="learning-modes">
+
+    <h3>How would you like to learn today?</h3>
+
+    <div class="mode-options">
+
+        <button class="mode-btn active" data-mode="explain">
+            📖 Explain a Topic
+        </button>
+
+        <button class="mode-btn" data-mode="question">
+            ❓ Ask a Question
+        </button>
+
+        <button class="mode-btn" data-mode="practice">
+            📝 Practice Questions
+        </button>
+
+    </div>
+
+    <p id="selectedMode">
+        Mode selected: Explain a Topic
+    </p>
+
+</section>
+        
+       <section class="conversation-history">
+
+    <div class="history-heading">
+        <h3>💬 My Conversations</h3>
+
+        <button id="newConversation">
+            + New Conversation
+        </button>
+    </div>
+
+    <div id="conversationList">
+        <p>No previous conversations yet.</p>
+    </div>
+
+    </section>
+        <section class="chat-card">
+
+    <div class="chat-header">
+        <h3>🤖 Your Learning Assistant</h3>
+        <p>Ask me anything about your studies.</p>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+
+        <div class="tutor-message">
+            <strong>EduCore Tutor</strong>
+            <p>
+                Hello! 👋 Welcome to your learning space.
+                What would you like to learn today?
+            </p>
+        </div>
+
+    </div>
+
+    <div class="chat-input-area">
+
+        <textarea
+            id="studentQuestion"
+            placeholder="Type your question here..."
+            rows="2"
+        ></textarea>
+
+        <button id="sendQuestion">
+            Send Message
+        </button>
+
+    </div>
+
+</section>
+
+    </main>
+    
+<script>
+const chatMessages = document.getElementById("chatMessages");
+const studentQuestion = document.getElementById("studentQuestion");
+const sendQuestion = document.getElementById("sendQuestion");
+
+// CONVERSATION TRACKING
+let currentConversationId = null;
+let currentStudentId = null;
+
+// STORE SELECTED CURRICULUM CONTEXT
+let selectedCurriculumContext = null;
+
+async function sendMessage() {
+
+    const question = studentQuestion.value.trim();
+    const tutorRequest = {
+    question: question,
+    class_level: document.getElementById("tutorClass").value,
+    subject: document.getElementById("tutorSubject").value,
+    learning_mode: document.querySelector(".mode-btn.active")?.dataset.mode || "explain",
+    curriculum_context: selectedCurriculumContext
+};
+
+    if (!question) {
+        alert("Please enter a question first.");
+        return;
+    }
+    // CREATE A NEW CONVERSATION
+if (!currentConversationId) {
+
+    const { data: conversation, error } =
+        await supabaseClient
+            .from("tutor_conversations")
+            .insert({
+                student_id: currentStudentId,
+                title: question.substring(0, 60)
+            })
+            .select()
+            .single();
+
+    if (error) {
+        console.error("Conversation error:", error);
+        alert("Could not start conversation. Please try again.");
+        return;
+    }
+
+    currentConversationId = conversation.id;
+}
+
+    // Display student's message
+    const studentBubble = document.createElement("div");
+    studentBubble.className = "student-message";
+    studentBubble.textContent = question;
+
+    chatMessages.appendChild(studentBubble);
+    // SAVE STUDENT MESSAGE
+const { error: studentMessageError } =
+    await supabaseClient
+        .from("tutor_messages")
+        .insert({
+            conversation_id: currentConversationId,
+            role: "student",
+            content: question
+        });
+
+if (studentMessageError) {
+    console.error("Student message error:", studentMessageError);
+    alert("Your message could not be saved. Please try again.");
+    return;
+}
+    studentQuestion.value = "";
+    // SEND REQUEST TO EDCORE BACKEND
+const backendResult = await sendTutorRequest(tutorRequest);
+
+    
+// Temporary tutor response
+const tutorBubble = document.createElement("div");
+tutorBubble.className = "tutor-message";
+
+const tutorName = document.createElement("strong");
+tutorName.textContent = "EduCore Tutor";
+
+const tutorText = document.createElement("p");
+
+const mode = tutorRequest.learning_mode;
+const selectedClass = tutorRequest.class_level;
+const selectedSubject = tutorRequest.subject;
+const selectedTopic = tutorRequest.curriculum_context;
+
+const responses = {
+    explain:
+        "I'll help you understand this topic step by step, using simple explanations and examples.",
+
+    question:
+        "I'll help you find a clear answer to your question and explain the important details.",
+
+    practice:
+        "I'll prepare practice questions to test your understanding, with answers and explanations."
+};
+
+let responseText = responses[mode];
+
+if (selectedTopic) {
+    responseText +=
+        " Your selected learning topic is " +
+        selectedTopic.topic + ".";
+}
+
+if (backendResult) {
+    responseText +=
+        " Your request has successfully reached EduCore's secure backend.";
+} else {
+    responseText +=
+        " We couldn't connect to the learning service. Please try again.";
+}
+
+responseText +=
+    " Real AI-generated answers will be activated when API credit is available.";
+
+tutorText.textContent = responseText;
+
+tutorBubble.appendChild(tutorName);
+tutorBubble.appendChild(tutorText);
+
+chatMessages.appendChild(tutorBubble);
+
+    // SAVE TUTOR RESPONSE
+const { error: tutorMessageError } =
+    await supabaseClient
+        .from("tutor_messages")
+        .insert({
+            conversation_id: currentConversationId,
+            role: "tutor",
+            content: tutorText.textContent
+        });
+
+if (tutorMessageError) {
+    console.error("Tutor message error:", tutorMessageError);
+}
+
+    // Scroll to latest message
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+
+async function sendTutorRequest(tutorRequest) {
+
+    const { data, error } = await supabaseClient.functions.invoke(
+        "Student-Tutor",
+        {
+            body: tutorRequest
+        }
+    );
+
+    if (error) {
+        console.error("Tutor backend error:", error);
+        return null;
+    }
+
+    return data;
+}
+
+
+sendQuestion.addEventListener("click", sendMessage);
+
+// Allow Enter to send, Shift + Enter for a new line
+studentQuestion.addEventListener("keydown", function(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
+});
+</script>
+
+<script>
+async function loadTutorProfile() {
+
+    // Get logged-in student
+    const { data: { user }, error: authError } =
+        await supabaseClient.auth.getUser();
+
+    if (authError || !user) {
+        window.location.href = "student-auth.html";
+        return;
+    }
+
+    // Confirm student account
+    if (user.user_metadata.account_type !== "student") {
+        await supabaseClient.auth.signOut();
+        window.location.href = "student-auth.html";
+        return;
+    }
+    // Store logged-in student's ID
+currentStudentId = user.id;
+    // Load student's saved conversations
+    await loadConversationHistory();
+
+    // Fetch student profile
+    const { data: profile, error } =
+        await supabaseClient
+            .from("student_profiles")
+            .select("class_level, subjects")
+            .eq("id", user.id)
+            .single();
+
+    if (error || !profile) {
+        console.error("Profile loading error:", error);
+        return;
+    }
+
+    // Automatically select student's class
+    document.getElementById("tutorClass").value =
+        profile.class_level;
+
+    // Load preferred subjects
+    const subjectSelect =
+        document.getElementById("tutorSubject");
+
+    const subjects = profile.subjects || [];
+
+    subjects.forEach(subject => {
+
+        const exists = Array.from(subjectSelect.options)
+            .some(option => option.value === subject);
+
+        if (!exists) {
+            const option = document.createElement("option");
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelect.appendChild(option);
+        }
+    });
+
+    // Select the first preferred subject
+    if (subjects.length > 0) {
+        subjectSelect.value = subjects[0];
+    }
+    // Load topics for the student's class and subject
+await loadTutorTopics();
+}
+
+// LOAD SAVED CONVERSATIONS
+async function loadConversationHistory() {
+
+    const { data: conversations, error } =
+        await supabaseClient
+            .from("tutor_conversations")
+            .select("id, title, created_at")
+            .eq("student_id", currentStudentId)
+            .order("created_at", { ascending: false });
+
+    const conversationList =
+        document.getElementById("conversationList");
+
+    if (error) {
+        console.error("Conversation history error:", error);
+        conversationList.textContent =
+            "Could not load conversations.";
+        return;
+    }
+
+    if (!conversations || conversations.length === 0) {
+        conversationList.textContent =
+            "No previous conversations yet.";
+        return;
+    }
+
+    conversationList.innerHTML = "";
+
+    conversations.forEach(conversation => {
+
+        const item = document.createElement("div");
+        item.className = "conversation-item";
+
+        const title = document.createElement("strong");
+        title.textContent = conversation.title;
+
+        const date = document.createElement("p");
+        date.textContent =
+            new Date(conversation.created_at).toLocaleString();
+
+        item.appendChild(title);
+        item.appendChild(date);
+
+        item.addEventListener("click", () => {
+            openConversation(conversation.id);
+        });
+
+        conversationList.appendChild(item);
+    });
+}
+
+// OPEN AN EXISTING CONVERSATION
+async function openConversation(conversationId) {
+
+    const { data: messages, error } =
+        await supabaseClient
+            .from("tutor_messages")
+            .select("role, content, created_at")
+            .eq("conversation_id", conversationId)
+            .order("created_at", { ascending: true });
+
+    if (error) {
+        console.error("Message loading error:", error);
+        alert("Could not open this conversation.");
+        return;
+    }
+
+    // Set the active conversation
+    currentConversationId = conversationId;
+
+    // Clear previous chat messages
+    chatMessages.innerHTML = "";
+
+    // Display saved messages
+    messages.forEach(message => {
+
+        const bubble = document.createElement("div");
+
+        if (message.role === "student") {
+            bubble.className = "student-message";
+            bubble.textContent = message.content;
+        } else {
+            bubble.className = "tutor-message";
+
+            const name = document.createElement("strong");
+            name.textContent = "EduCore Tutor";
+
+            const content = document.createElement("p");
+            content.textContent = message.content;
+
+            bubble.appendChild(name);
+            bubble.appendChild(content);
+        }
+
+        chatMessages.appendChild(bubble);
+    });
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+loadTutorProfile();
+
+// LEARNING MODE SELECTION
+
+const modeButtons = document.querySelectorAll(".mode-btn");
+const selectedMode = document.getElementById("selectedMode");
+
+modeButtons.forEach(button => {
+
+    button.addEventListener("click", function() {
+
+        // Remove active state from all buttons
+        modeButtons.forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+        // Activate selected button
+        this.classList.add("active");
+
+        // Update selected mode
+        const mode = this.dataset.mode;
+
+        const modeNames = {
+            explain: "Explain a Topic",
+            question: "Ask a Question",
+            practice: "Practice Questions"
+        };
+
+        selectedMode.textContent =
+            "Mode selected: " + modeNames[mode];
+
+    });
+
+});
+
+// START A NEW CONVERSATION
+document.getElementById("newConversation")
+    .addEventListener("click", function() {
+
+        // Reset active conversation
+        currentConversationId = null;
+
+        // Clear chat messages
+        chatMessages.innerHTML = "";
+
+        // Restore welcome message
+        const welcome = document.createElement("div");
+        welcome.className = "tutor-message";
+
+        const name = document.createElement("strong");
+        name.textContent = "EduCore Tutor";
+
+        const message = document.createElement("p");
+        message.textContent =
+            "Hello again! 👋 What would you like to learn today?";
+
+        welcome.appendChild(name);
+        welcome.appendChild(message);
+
+        chatMessages.appendChild(welcome);
+
+        // Clear input
+        studentQuestion.value = "";
+
+    });
+    
+    
+// LOAD CURRICULUM TOPICS
+async function loadTutorTopics() {
+
+    const classLevel =
+        document.getElementById("tutorClass").value;
+
+    const subject =
+        document.getElementById("tutorSubject").value;
+
+    const topicSelect =
+        document.getElementById("tutorTopic");
+
+    topicSelect.innerHTML =
+        '<option value="">Loading topics...</option>';
+
+    if (!classLevel || !subject) {
+        topicSelect.innerHTML =
+            '<option value="">Choose a class and subject first</option>';
+        return;
+    }
+
+    const { data: topics, error } =
+        await supabaseClient
+            .from("curriculum_topics")
+            .select("id, topic, term, week")
+            .eq("class_level", classLevel)
+            .eq("subject", subject)
+            .order("term")
+            .order("week");
+
+    topicSelect.innerHTML =
+        '<option value="">Choose a topic to study</option>';
+
+    if (error) {
+        console.error("Topic loading error:", error);
+        topicSelect.innerHTML =
+            '<option value="">Could not load topics</option>';
+        return;
+    }
+
+    if (!topics || topics.length === 0) {
+        topicSelect.innerHTML =
+            '<option value="">No topics available yet</option>';
+        return;
+    }
+
+    topics.forEach(item => {
+
+        const option = document.createElement("option");
+
+        option.value = item.id;
+
+        option.textContent =
+            `${item.topic} (${item.term}, Week ${item.week})`;
+
+        topicSelect.appendChild(option);
+
+    });
+}
+
+// Reload topics when class or subject changes
+document.getElementById("tutorClass")
+    .addEventListener("change", loadTutorTopics);
+
+document.getElementById("tutorSubject")
+    .addEventListener("change", loadTutorTopics);
+
+    
+// LOAD SELECTED TOPIC'S CURRICULUM CONTENT
+async function loadCurriculumContext() {
+
+    const topicId =
+        document.getElementById("tutorTopic").value;
+
+    const message =
+        document.getElementById("contextMessage");
+
+    const details =
+        document.getElementById("contextDetails");
+
+    details.innerHTML = "";
+
+    if (!topicId) {
+        message.textContent =
+            "Select a curriculum topic to see its learning guide.";
+        return;
+    }
+
+    message.textContent = "Loading your learning guide...";
+
+    const { data: topic, error } = await supabaseClient
+        .from("curriculum_topics")
+        .select(`
+            topic,
+            subject,
+            class_level,
+            term,
+            week,
+            content,
+            subtopics,
+            learning_outcomes,
+            key_points,
+            curriculum_sources (
+                title,
+                issuing_body,
+                source_type
+            )
+        `)
+        .eq("id", topicId)
+        .single();
+
+    if (error || !topic) {
+        selectedCurriculumContext = null;
+        console.error("Curriculum context error:", error);
+        message.textContent =
+            "Unable to load this topic's learning guide.";
+        return;
+    }
+    selectedCurriculumContext = topic;
+    
+    message.textContent =
+        `${topic.class_level} | ${topic.subject} | ${topic.term}, Week ${topic.week}`;
+
+    function addSection(heading, content) {
+
+        if (!content || (Array.isArray(content) && content.length === 0)) {
+            return;
+        }
+
+        const section = document.createElement("div");
+        section.className = "context-section";
+
+        const title = document.createElement("h4");
+        title.textContent = heading;
+
+        section.appendChild(title);
+
+        if (Array.isArray(content)) {
+
+            const list = document.createElement("ul");
+
+            content.forEach(item => {
+                const li = document.createElement("li");
+                li.textContent = item;
+                list.appendChild(li);
+            });
+
+            section.appendChild(list);
+
+        } else {
+
+            const paragraph = document.createElement("p");
+            paragraph.textContent = content;
+            section.appendChild(paragraph);
+
+        }
+
+        details.appendChild(section);
+    }
+
+    addSection("📖 Lesson Content", topic.content);
+    addSection("📌 Subtopics", topic.subtopics);
+    addSection("🎯 Learning Outcomes", topic.learning_outcomes);
+    addSection("💡 Key Points to Remember", topic.key_points);
+
+    const source = Array.isArray(topic.curriculum_sources)
+        ? topic.curriculum_sources[0]
+        : topic.curriculum_sources;
+
+    if (source) {
+        addSection(
+            "📚 Curriculum Source",
+            `${source.title} — ${source.issuing_body}`
+        );
+    }
+}
+
+// Load learning guide when a topic is selected
+document.getElementById("tutorTopic")
+    .addEventListener("change", loadCurriculumContext);
+
+
+</script>
+
+</body>
+</html>

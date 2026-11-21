@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduCore | Teacher Portal</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #EAF5FF;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #102A43;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(16,42,67,0.1);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo h1 {
+            color: #102A43;
+            font-size: 30px;
+        }
+
+        .logo span {
+            color: #2196F3;
+        }
+
+        .logo p {
+            color: #627D98;
+            margin-top: 7px;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #EAF5FF;
+            padding: 5px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .tabs button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            cursor: pointer;
+            background: transparent;
+            color: #102A43;
+            font-weight: bold;
+            border-radius: 6px;
+        }
+
+        .tabs button.active {
+            background: #2196F3;
+            color: white;
+        }
+
+        h2 {
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #627D98;
+            font-size: 14px;
+            margin-bottom: 22px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #CBD5E1;
+            border-radius: 7px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #2196F3;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            display: none;
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .success {
+            display: block;
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .error {
+            display: block;
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 22px;
+            color: #2196F3;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media(max-width: 400px) {
+            .container {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">
+        <h1>Edu<span>Core</span></h1>
+        <p>Empowering Teachers. Inspiring Learners.</p>
+    </div>
+
+    <div class="tabs">
+        <button id="registerTab" class="active">Register</button>
+        <button id="loginTab">Login</button>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <!-- REGISTRATION FORM -->
+    <form id="registerForm">
+
+        <h2>Create Teacher Account</h2>
+
+        <p class="description">
+            Join EduCore and make teaching more effective with AI.
+        </p>
+
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="fullName" required
+                placeholder="Enter your full name">
+        </div>
+
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="registerEmail" required
+                placeholder="Enter your email">
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="registerPassword"
+                minlength="8" required
+                placeholder="Minimum 8 characters">
+        </div>
+
+        <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="confirmPassword"
+                minlength="8" required
+                placeholder="Confirm your password">
+        </div>
+
+        <div class="form-group">
+            <label>School Name (Optional)</label>
+            <input type="text" id="schoolName"
+                placeholder="Enter your school name">
+        </div>
+
+        <div class="form-group">
+            <label>Teaching Level</label>
+            <select id="teachingLevel" required>
+                <option value="">Select teaching level</option>
+                <option value="JSS">Junior Secondary (JSS)</option>
+                <option value="SSS">Senior Secondary (SSS)</option>
+                <option value="Both">Both JSS and SSS</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Subjects Taught</label>
+            <input type="text" id="subjects" required
+                placeholder="e.g. Mathematics, English, Biology">
+        </div>
+
+        <button type="submit" class="submit-btn">
+            Create Account
+        </button>
+
+    </form>
+
+    <!-- LOGIN FORM -->
+    <form id="loginForm" class="hidden">
+
+        <h2>Welcome Back!</h2>
+
+        <p class="description">
+            Log in to access your EduCore teacher portal.
+        </p>
+
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="loginEmail" required
+                placeholder="Enter your email">
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" required
+                placeholder="Enter your password">
+        </div>
+
+        <button type="submit" class="submit-btn">
+            Login
+        </button>
+
+    </form>
+
+    <a href="index.html" class="back-link">
+        ← Back to EduCore Home
+    </a>
+
+</div>
+
+<script>
+
+// ==================================
+// SUPABASE CONNECTION
+// ==================================
+
+const SUPABASE_URL = "https://xpcumdfehmfbxxycpghg.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_D42fTNuZmLQcExVgb9tCmw_wtfnzwc1";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+// ==================================
+// FORM ELEMENTS
+// ==================================
+
+const registerForm = document.getElementById("registerForm");
+const loginForm = document.getElementById("loginForm");
+
+const registerTab = document.getElementById("registerTab");
+const loginTab = document.getElementById("loginTab");
+
+const messageBox = document.getElementById("message");
+
+
+// ==================================
+// SHOW MESSAGES
+// ==================================
+
+function showMessage(message, type) {
+
+    messageBox.textContent = message;
+
+    messageBox.className = "message " + type;
+
+}
+
+function clearMessage() {
+
+    messageBox.textContent = "";
+
+    messageBox.className = "message";
+
+}
+
+
+// ==================================
+// SWITCH BETWEEN FORMS
+// ==================================
+
+registerTab.addEventListener("click", () => {
+
+    registerForm.classList.remove("hidden");
+    loginForm.classList.add("hidden");
+
+    registerTab.classList.add("active");
+    loginTab.classList.remove("active");
+
+    clearMessage();
+
+});
+
+loginTab.addEventListener("click", () => {
+
+    loginForm.classList.remove("hidden");
+    registerForm.classList.add("hidden");
+
+    loginTab.classList.add("active");
+    registerTab.classList.remove("active");
+
+    clearMessage();
+
+});
+
+
+// ==================================
+// TEACHER REGISTRATION
+// ==================================
+
+registerForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    clearMessage();
+
+    const fullName =
+        document.getElementById("fullName").value.trim();
+
+    const email =
+        document.getElementById("registerEmail").value.trim();
+
+    const password =
+        document.getElementById("registerPassword").value;
+
+    const confirmPassword =
+        document.getElementById("confirmPassword").value;
+
+    const schoolName =
+        document.getElementById("schoolName").value.trim();
+
+    const teachingLevel =
+        document.getElementById("teachingLevel").value;
+
+    const subjects =
+        document.getElementById("subjects").value.trim();
+
+    if (password !== confirmPassword) {
+
+        showMessage("Passwords do not match.", "error");
+
+        return;
+
+    }
+
+    if (password.length < 8) {
+
+        showMessage(
+            "Password must contain at least 8 characters.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    const button = registerForm.querySelector("button");
+
+    button.disabled = true;
+    button.textContent = "Creating Account...";
+
+    try {
+
+        const { data, error } =
+            await supabaseClient.auth.signUp({
+
+                email: email,
+
+                password: password,
+
+                options: {
+
+                    data: {
+                        account_type: "teacher",
+
+                        full_name: fullName,
+
+                        school_name: schoolName,
+
+                        teaching_level: teachingLevel,
+
+                        subjects: subjects
+
+                    }
+
+                }
+
+            });
+
+        if (error) throw error;
+
+        if (data.session) {
+
+            showMessage(
+                "Account created successfully! You can now log in.",
+                "success"
+            );
+
+        } else {
+
+            showMessage(
+                "Registration successful! Please check your email and confirm your account before logging in.",
+                "success"
+            );
+
+        }
+
+        registerForm.reset();
+
+    } catch (error) {
+
+        showMessage(error.message, "error");
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Create Account";
+
+    }
+
+});
+
+
+// ==================================
+// TEACHER LOGIN
+// ==================================
+
+loginForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    clearMessage();
+
+    const email =
+        document.getElementById("loginEmail").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
+    const button = loginForm.querySelector("button");
+
+    button.disabled = true;
+    button.textContent = "Logging in...";
+
+    try {
+
+        const { data, error } =
+            await supabaseClient.auth.signInWithPassword({
+
+                email: email,
+
+                password: password
+
+            });
+
+        if (error) throw error;
+
+        showMessage(
+    "Login successful! Redirecting to your dashboard...",
+    "success"
+);
+
+setTimeout(() => {
+    window.location.href = "teacher-dashboard.html";
+}, 1200);
+
+    } catch (error) {
+
+        showMessage(error.message, "error");
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Login";
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>

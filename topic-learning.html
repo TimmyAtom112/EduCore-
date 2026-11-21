@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Topic Learning | EduCore</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #EAF5FF;
+            color: #102A43;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #102A43;
+            color: white;
+            padding: 20px;
+        }
+
+        .header-content {
+            max-width: 900px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 35px auto;
+            padding: 0 18px;
+        }
+
+        .topic-header {
+            background: #102A43;
+            color: white;
+            padding: 28px;
+            border-radius: 14px;
+            margin-bottom: 22px;
+        }
+
+        .topic-header h1 {
+            margin-bottom: 12px;
+            font-size: 28px;
+        }
+
+        .topic-header p {
+            line-height: 1.6;
+            color: #D9EAF7;
+        }
+
+        .learning-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            box-shadow: 0 3px 12px rgba(16, 42, 67, 0.06);
+        }
+
+        .learning-card h2 {
+            margin-bottom: 15px;
+            color: #102A43;
+        }
+
+        .learning-card p {
+    line-height: 1.9;
+    color: #486581;
+    white-space: pre-line;
+    font-size: 15px;
+}
+
+#topicOverview {
+    font-size: 16px;
+    line-height: 2;
+    color: #334E68;
+}
+
+.learning-card {
+    background: white;
+    padding: 26px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(16, 42, 67, 0.06);
+}
+
+.learning-card h2 {
+    margin-bottom: 18px;
+    color: #102A43;
+    font-size: 21px;
+    border-bottom: 2px solid #EAF5FF;
+    padding-bottom: 12px;
+}
+
+        .learning-card ul {
+            padding-left: 22px;
+            color: #486581;
+            line-height: 1.9;
+        }
+
+        .status {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 500px) {
+            .topic-header h1 {
+                font-size: 23px;
+            }
+
+            .learning-card {
+                padding: 18px;
+            }
+        }
+        
+        .quiz-question {
+    background: #F5FAFF;
+    padding: 18px;
+    border-radius: 10px;
+    margin-top: 18px;
+    border: 1px solid #D6E8F7;
+}
+
+.quiz-question h3 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.quiz-option {
+    display: block;
+    background: white;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #D6E8F7;
+    cursor: pointer;
+    line-height: 1.5;
+}
+
+.quiz-option:hover {
+    border-color: #2196F3;
+}
+
+.quiz-option input {
+    margin-right: 10px;
+}
+
+.quiz-feedback {
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.quiz-correct {
+    color: #16803C;
+}
+
+.quiz-wrong {
+    color: #D93025;
+}
+
+#submitQuiz {
+    font-weight: bold;
+}
+
+#submitQuiz:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-content">
+        <h2>EduCore</h2>
+        <a href="subject-explorer.html">← Subjects</a>
+    </div>
+</header>
+
+<main>
+
+    <section class="topic-header">
+        <h1 id="topicTitle">Loading Topic...</h1>
+        <p id="topicDetails">Preparing your learning materials.</p>
+    </section>
+
+    <section class="learning-card">
+        <h2>📚 Subtopics</h2>
+        <ul id="subtopics"></ul>
+    </section>
+
+    <section class="learning-card">
+        <h2>🎯 What You Should Learn</h2>
+        <ul id="learningOutcomes"></ul>
+    </section>
+    
+    <section class="learning-card">
+        <h2>🏫 Curriculum Source</h2>
+        <p id="curriculumSource">Loading source...</p>
+    </section>
+
+    <section class="learning-card">
+        <h2>📖 Learn This Topic</h2>
+        <p id="topicOverview">
+            Your topic explanation will appear here.
+        </p>
+    </section>
+    
+    <section class="learning-card">
+    <h2>💡 Key Points to Remember</h2>
+    <ul id="keyPoints">
+        <li>Key learning points will appear here.</li>
+    </ul>
+</section>
+<section class="learning-card" id="practiceSection">
+
+    <h2>📝 Test Your Understanding</h2>
+
+    <p>
+        Answer these questions to test what you have learned.
+    </p>
+
+    <div id="quizContainer">
+        <p>Practice questions will appear here.</p>
+    </div>
+
+    <button id="submitQuiz" style="
+        display:none;
+        margin-top:20px;
+        padding:13px 22px;
+        background:#2196F3;
+        color:white;
+        border:none;
+        border-radius:8px;
+        cursor:pointer;
+        font-size:15px;
+    ">
+        Submit Answers
+    </button>
+
+    <div id="quizResult" style="margin-top:20px;"></div>
+
+</section>
+
+</main>
+
+<script>
+    const SUPABASE_URL = "https://xpcumdfehmfbxxycpghg.supabase.co";
+
+    const SUPABASE_KEY = "sb_publishable_D42fTNuZmLQcExVgb9tCmw_wtfnzwc1";
+
+    const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+    // DISPLAY LIST ITEMS
+    function displayList(elementId, items) {
+
+        const container = document.getElementById(elementId);
+
+        container.innerHTML = "";
+
+        if (!items || items.length === 0) {
+            const li = document.createElement("li");
+            li.textContent = "Information will be available soon.";
+            container.appendChild(li);
+            return;
+        }
+
+        items.forEach(item => {
+
+            const li = document.createElement("li");
+
+            if (typeof item === "string") {
+                li.textContent = item;
+            } else if (item && typeof item === "object") {
+                li.textContent =
+                    item.text ||
+                    item.title ||
+                    item.content ||
+                    "Learning information";
+            } else {
+                li.textContent = String(item);
+            }
+
+            container.appendChild(li);
+
+        });
+    }
+
+
+    // LOAD SELECTED TOPIC
+    async function loadTopic() {
+
+        const params = new URLSearchParams(window.location.search);
+        const topicId = params.get("id");
+
+        if (!topicId) {
+            document.getElementById("topicTitle").textContent =
+                "No topic selected.";
+
+            document.getElementById("topicDetails").textContent =
+                "Please return to Subject Explorer and select a topic.";
+
+            return;
+        }
+
+
+        // CHECK STUDENT LOGIN
+        const { data: { user }, error: authError } =
+            await supabaseClient.auth.getUser();
+
+        if (authError || !user) {
+            window.location.href = "student-auth.html";
+            return;
+        }
+
+
+        // CHECK ACCOUNT TYPE
+        if (user.user_metadata.account_type !== "student") {
+
+            await supabaseClient.auth.signOut();
+
+            window.location.href = "student-auth.html";
+
+            return;
+        }
+
+
+        // GET STUDENT PROFILE
+        const { data: profile, error: profileError } =
+            await supabaseClient
+                .from("student_profiles")
+                .select("class_level")
+                .eq("id", user.id)
+                .single();
+
+        if (profileError || !profile) {
+
+            document.getElementById("topicTitle").textContent =
+                "Unable to load student profile.";
+
+            return;
+        }
+
+
+        // GET SELECTED CURRICULUM TOPIC
+        const { data: topic, error } = await supabaseClient
+            .from("curriculum_topics")
+            .select(`
+                id,
+                class_level,
+                subject,
+                topic,
+                term,
+                week,
+                theme,
+                content,
+                subtopics,
+                learning_outcomes,
+                key_points,
+                curriculum_sources (
+                    title,
+                    issuing_body,
+                    source_type
+                )
+            `)
+            .eq("id", topicId)
+            .eq("class_level", profile.class_level)
+            .single();
+
+
+        if (error || !topic) {
+
+            document.getElementById("topicTitle").textContent =
+                "Topic not found.";
+
+            document.getElementById("topicDetails").textContent =
+                "This topic may not be available for your class.";
+
+            console.error("Topic loading error:", error);
+
+            return;
+        }
+
+    // RECORD STUDENT TOPIC PROGRESS
+const { error: progressError } = await supabaseClient
+    .from("student_topic_progress")
+    .upsert(
+        {
+            student_id: user.id,
+            topic_id: topic.id
+        },
+        {
+            onConflict: "student_id,topic_id",
+            ignoreDuplicates: true
+        }
+    );
+
+if (progressError) {
+    console.error("Progress tracking error:", progressError);
+}
+
+        // DISPLAY TOPIC INFORMATION
+        document.getElementById("topicTitle").textContent =
+            topic.topic;
+
+        document.getElementById("topicDetails").textContent =
+            `${topic.subject} | ${topic.class_level} | ${topic.term} | Week ${topic.week}`;
+
+
+        // DISPLAY LESSON CONTENT
+        document.getElementById("topicOverview").textContent =
+            topic.content ||
+            "A detailed explanation for this topic will be available soon.";
+
+
+        // DISPLAY SUBTOPICS
+        displayList("subtopics", topic.subtopics);
+
+
+        // DISPLAY LEARNING OUTCOMES
+        displayList("learningOutcomes", topic.learning_outcomes);
+
+
+        // DISPLAY KEY POINTS
+        displayList("keyPoints", topic.key_points);
+        loadPracticeQuestions(topic.id);
+
+
+        // DISPLAY CURRICULUM SOURCE
+        let source = topic.curriculum_sources;
+
+        if (Array.isArray(source)) {
+            source = source[0];
+        }
+
+        let sourceLabel = "Curriculum Source";
+
+        if (source?.source_type === "national_curriculum") {
+            sourceLabel = "National Curriculum";
+        }
+
+        else if (source?.source_type === "state_scheme") {
+            sourceLabel = "State Scheme of Work";
+        }
+
+        else if (source?.source_type === "school_scheme") {
+            sourceLabel = "School Scheme of Work";
+        }
+
+        document.getElementById("curriculumSource").textContent =
+            `${sourceLabel}${source?.title ? " — " + source.title : ""}`;
+
+    }
+
+    // LOAD PRACTICE QUESTIONS
+async function loadPracticeQuestions(topicId) {
+
+    const quizContainer = document.getElementById("quizContainer");
+    const submitButton = document.getElementById("submitQuiz");
+    const resultContainer = document.getElementById("quizResult");
+
+    quizContainer.innerHTML = "<p>Loading questions...</p>";
+
+    const { data: questions, error } = await supabaseClient
+        .from("practice_questions")
+        .select("*")
+        .eq("topic_id", topicId)
+        .limit(5);
+
+    if (error) {
+        quizContainer.textContent =
+            "Unable to load practice questions.";
+
+        console.error("Quiz error:", error);
+        return;
+    }
+
+    if (!questions || questions.length === 0) {
+        quizContainer.textContent =
+            "Practice questions for this topic will be available soon.";
+        return;
+    }
+
+    quizContainer.innerHTML = "";
+    resultContainer.innerHTML = "";
+
+    questions.forEach((q, index) => {
+
+        const questionDiv = document.createElement("div");
+        questionDiv.className = "quiz-question";
+
+        const title = document.createElement("h3");
+        title.textContent = `${index + 1}. ${q.question}`;
+
+        questionDiv.appendChild(title);
+
+        const feedback = document.createElement("div");
+        feedback.className = "quiz-feedback";
+
+        ["A", "B", "C", "D"].forEach(letter => {
+
+            const label = document.createElement("label");
+            label.className = "quiz-option";
+
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = `question-${index}`;
+            radio.value = letter;
+
+            const optionText = document.createElement("span");
+            optionText.textContent =
+                `${letter}. ${q["option_" + letter.toLowerCase()]}`;
+
+            label.append(radio, optionText);
+            questionDiv.appendChild(label);
+
+        });
+
+        questionDiv.appendChild(feedback);
+
+        quizContainer.appendChild(questionDiv);
+
+    });
+
+    submitButton.style.display = "block";
+    submitButton.disabled = false;
+
+    submitButton.onclick = async function () {
+
+        let score = 0;
+        let answered = 0;
+
+        questions.forEach((q, index) => {
+
+            const selected = document.querySelector(
+                `input[name="question-${index}"]:checked`
+            );
+
+            if (!selected) {
+                return;
+            }
+
+            answered++;
+
+            if (selected.value === q.correct_answer) {
+                score++;
+            }
+
+        });
+
+        if (answered < questions.length) {
+            resultContainer.textContent =
+                "Please answer all questions before submitting.";
+            return;
+        }
+
+        questions.forEach((q, index) => {
+
+            const selected = document.querySelector(
+                `input[name="question-${index}"]:checked`
+            );
+
+            const feedback = document.querySelectorAll(".quiz-feedback")[index];
+
+            const correct = selected.value === q.correct_answer;
+
+            feedback.className = correct
+                ? "quiz-feedback quiz-correct"
+                : "quiz-feedback quiz-wrong";
+
+            feedback.textContent =
+                (correct ? "Correct! " : "Incorrect. ") +
+                `Correct answer: ${q.correct_answer}. ` +
+                (q.explanation || "");
+
+        });
+
+        resultContainer.textContent =
+            `You scored ${score} out of ${questions.length}.`;
+           
+            // SAVE QUIZ RESULT
+const { data: { user } } =
+    await supabaseClient.auth.getUser();
+
+const { error: saveError } = await supabaseClient
+    .from("quiz_attempts")
+    .insert({
+        student_id: user.id,
+        topic_id: topicId,
+        score: score,
+        total_questions: questions.length
+    });
+
+if (saveError) {
+    console.error("Quiz result saving error:", saveError);
+}
+            
+        document.querySelectorAll("#quizContainer input").forEach(input => {
+            input.disabled = true;
+        });
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Quiz Completed";
+
+    };
+}
+
+    // START PAGE
+    loadTopic();
+
+</script>
+
+</body>
+</html>

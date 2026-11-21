@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduCore | AI Lesson Planner</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #F1F6FB;
+            color: #102A43;
+        }
+
+        header {
+            background: #102A43;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #42A5F5;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        main {
+            max-width: 750px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .intro {
+            margin-bottom: 25px;
+        }
+
+        .intro h1 {
+            font-size: 27px;
+            margin-bottom: 10px;
+        }
+
+        .intro p {
+            color: #627D98;
+            line-height: 1.6;
+        }
+
+        .planner-card {
+            background: white;
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .planner-card h2 {
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #627D98;
+            font-size: 14px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #CBD5E1;
+            border-radius: 7px;
+            font-size: 15px;
+            outline: none;
+            background: white;
+            color: #102A43;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #2196F3;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 7px;
+            background: #2196F3;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            display: none;
+            padding: 13px;
+            margin-bottom: 18px;
+            border-radius: 7px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .info {
+            display: block;
+            background: #EAF5FF;
+            color: #145DA0;
+        }
+
+        .error {
+            display: block;
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .level-badge {
+            display: inline-block;
+            background: #EAF5FF;
+            color: #1976D2;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #829AB1;
+            font-size: 13px;
+        }
+
+        @media(max-width: 500px) {
+            .planner-card {
+                padding: 20px;
+            }
+
+            .intro h1 {
+                font-size: 23px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Edu<span>Core</span></div>
+    <a href="teacher-dashboard.html" class="back-btn">
+        ← Dashboard
+    </a>
+</header>
+
+<main>
+
+    <section class="intro">
+        <h1>AI Lesson Planner 📚</h1>
+
+        <p>
+            Prepare structured lesson plans and detailed
+            lesson notes with the assistance of artificial
+            intelligence.
+        </p>
+
+        <span class="level-badge" id="levelBadge">
+            Loading teaching level...
+        </span>
+    </section>
+
+    <section class="planner-card">
+
+        <h2>Create a Lesson Plan</h2>
+
+        <p class="description">
+            Provide your lesson details to get started.
+        </p>
+
+        <div id="message" class="message"></div>
+
+        <form id="lessonForm">
+
+            <div class="form-group">
+                <label for="classLevel">Select Class</label>
+
+                <select id="classLevel" required>
+                    <option value="">Loading classes...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Subject</label>
+
+                <input
+                    type="text"
+                    id="subject"
+                    placeholder="e.g. Mathematics"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="topic">Lesson Topic</label>
+
+                <input
+                    type="text"
+                    id="topic"
+                    placeholder="Enter the lesson topic"
+                    required
+                >
+            </div>
+            
+        <!-- CURRICULUM INFORMATION -->
+
+<div id="curriculumDetails" style="
+    display: none;
+    background: #EAF5FF;
+    padding: 18px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+">
+
+    <h3 style="margin-bottom: 12px;">
+        📚 Curriculum Guide
+    </h3>
+    
+    <p id="curriculumSource" style="
+    font-size: 13px;
+    color: #1976D2;
+    margin-bottom: 18px;
+    font-weight: bold;
+">
+    Curriculum Source: Loading...
+</p>
+
+    <h4>Subtopics</h4>
+    <ul id="subtopicsList" style="
+        padding-left: 20px;
+        margin: 10px 0 18px;
+        line-height: 1.7;
+    "></ul>
+
+    <h4>Learning Outcomes</h4>
+    <ul id="outcomesList" style="
+        padding-left: 20px;
+        margin-top: 10px;
+        line-height: 1.7;
+    "></ul>
+
+</div>
+
+            <div class="form-group">
+                <label for="term">School Term</label>
+
+                <select id="term" required>
+                    <option value="">Select term</option>
+                    <option value="First Term">First Term</option>
+                    <option value="Second Term">Second Term</option>
+                    <option value="Third Term">Third Term</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="week">Week</label>
+
+                <select id="week" required>
+                    <option value="">Select week</option>
+                    <option value="Week 1">Week 1</option>
+                    <option value="Week 2">Week 2</option>
+                    <option value="Week 3">Week 3</option>
+                    <option value="Week 4">Week 4</option>
+                    <option value="Week 5">Week 5</option>
+                    <option value="Week 6">Week 6</option>
+                    <option value="Week 7">Week 7</option>
+                    <option value="Week 8">Week 8</option>
+                    <option value="Week 9">Week 9</option>
+                    <option value="Week 10">Week 10</option>
+                    <option value="Week 11">Week 11</option>
+                    <option value="Week 12">Week 12</option>
+                    <option value="Week 13">Week 13</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Lesson Duration</label>
+
+                <select id="duration" required>
+                    <option value="">Select duration</option>
+                    <option value="30 minutes">30 minutes</option>
+                    <option value="40 minutes">40 minutes</option>
+                    <option value="45 minutes">45 minutes</option>
+                    <option value="60 minutes">60 minutes</option>
+                    <option value="80 minutes">80 minutes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="additionalInfo">
+                    Additional Instructions (Optional)
+                </label>
+
+                <textarea
+                    id="additionalInfo"
+                    placeholder="Any special instructions for this lesson?"
+                ></textarea>
+            </div>
+
+            <button type="submit" class="generate-btn">
+    ✨ Generate Lesson
+       </button>
+
+        </form>
+
+    </section>
+    
+    <!-- GENERATED LESSON DISPLAY -->
+
+<section id="generatedLessonSection" style="
+    display: none;
+    max-width: 750px;
+    margin: 25px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+">
+
+    <h2 style="margin-bottom: 15px;">
+        📚 Your Generated Lesson
+    </h2>
+
+    <div id="generatedLesson" style="
+        line-height: 1.8;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        color: #102A43;
+    "></div>
+
+</section>
+
+</main>
+
+<footer>
+    EduCore © 2026 | Empowering Teachers. Inspiring Learners.
+</footer>
+
+<script>
+
+// SUPABASE CONNECTION
+
+const SUPABASE_URL = "https://xpcumdfehmfbxxycpghg.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_D42fTNuZmLQcExVgb9tCmw_wtfnzwc1";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+// PAGE ELEMENTS
+
+const classSelect = document.getElementById("classLevel");
+
+const levelBadge = document.getElementById("levelBadge");
+
+const messageBox = document.getElementById("message");
+let selectedCurriculum = null;
+
+// DISPLAY MESSAGE
+
+function showMessage(message, type) {
+
+    messageBox.textContent = message;
+
+    messageBox.className = "message " + type;
+
+}
+
+
+// LOAD TEACHER INFORMATION
+
+async function loadTeacher() {
+
+    const { data: { user }, error: authError } =
+        await supabaseClient.auth.getUser();
+
+    if (authError || !user) {
+
+        window.location.href = "teacher-auth.html";
+
+        return;
+
+    }
+
+    const { data, error } = await supabaseClient
+        .from("teacher_profiles")
+        .select("teaching_level")
+        .eq("id", user.id)
+        .single();
+
+    if (error || !data) {
+
+        showMessage(
+            "Unable to retrieve your teaching information.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    const teachingLevel = data.teaching_level;
+
+    levelBadge.textContent =
+        "Registered Teaching Level: " + teachingLevel;
+
+
+    // RESTRICT AVAILABLE CLASSES
+
+    let classes = [];
+
+    if (teachingLevel === "JSS") {
+
+        classes = ["JSS1", "JSS2", "JSS3"];
+
+    } else if (teachingLevel === "SSS") {
+
+        classes = ["SS1", "SS2", "SS3"];
+
+    } else if (teachingLevel === "Both") {
+
+        classes = [
+            "JSS1",
+            "JSS2",
+            "JSS3",
+            "SS1",
+            "SS2",
+            "SS3"
+        ];
+
+    }
+
+    classSelect.innerHTML =
+        '<option value="">Select your class</option>';
+
+    classes.forEach(className => {
+
+        const option = document.createElement("option");
+
+        option.value = className;
+
+        option.textContent = className;
+
+        classSelect.appendChild(option);
+
+    });
+
+}
+
+// CURRICULUM TOPIC LOOKUP
+
+async function loadCurriculumTopic() {
+
+    const classLevel = classSelect.value;
+
+    const subject = document.getElementById("subject").value.trim();
+
+    const term = document.getElementById("term").value;
+
+    const weekValue = document.getElementById("week").value;
+
+    if (!classLevel || !subject || !term || !weekValue) {
+        return;
+    }
+
+    const weekNumber = parseInt(
+        weekValue.replace("Week ", "")
+    );
+
+    showMessage(
+        "Checking the curriculum database...",
+        "info"
+    );
+
+    const { data, error } = await supabaseClient
+        .from("curriculum_topics")
+        .select(`
+    topic,
+    theme,
+    subtopics,
+    content,
+    learning_outcomes,
+    curriculum_sources (
+        title,
+        issuing_body,
+        source_type,
+        curriculum_version
+    )
+`)
+        .eq("class_level", classLevel)
+        .eq("subject", subject)
+        .eq("term", term)
+        .eq("week", weekNumber)
+        .limit(1)
+        .maybeSingle();
+
+    if (error) {
+
+        showMessage(
+            "Unable to retrieve the curriculum topic. Please try again.",
+            "error"
+        );
+
+        console.error(error);
+
+        return;
+    }
+
+    if (!data) {
+
+        showMessage(
+            "No matching topic was found in the current curriculum database. You can still enter a topic manually.",
+            "info"
+        );
+
+        return;
+    }
+
+    document.getElementById("topic").value = data.topic;
+    selectedCurriculum = data;
+    
+    // DISPLAY CURRICULUM SOURCE
+
+const source = data.curriculum_sources;
+
+const sourceDisplay =
+    document.getElementById("curriculumSource");
+
+if (source) {
+
+    const sourceTypes = {
+        national_curriculum: "National Curriculum",
+        state_scheme: "State Scheme of Work",
+        school_scheme: "School Scheme of Work"
+    };
+
+    sourceDisplay.textContent =
+        "Curriculum Source: " +
+        (sourceTypes[source.source_type] || source.source_type) +
+        " — " + source.title;
+
+} else {
+
+    sourceDisplay.textContent =
+        "Curriculum source information unavailable.";
+
+}
+    
+    // DISPLAY CURRICULUM DETAILS
+
+const curriculumDetails =
+    document.getElementById("curriculumDetails");
+
+const subtopicsList =
+    document.getElementById("subtopicsList");
+
+const outcomesList =
+    document.getElementById("outcomesList");
+
+subtopicsList.innerHTML = "";
+outcomesList.innerHTML = "";
+
+(data.subtopics || []).forEach(item => {
+
+    const li = document.createElement("li");
+
+    li.textContent = item;
+
+    subtopicsList.appendChild(li);
+
+});
+
+(data.learning_outcomes || []).forEach(item => {
+
+    const li = document.createElement("li");
+
+    li.textContent = item;
+
+    outcomesList.appendChild(li);
+
+});
+
+curriculumDetails.style.display = "block";
+
+    showMessage(
+        "Curriculum topic retrieved successfully: " + data.topic,
+        "info"
+    );
+
+}
+
+// CHECK CURRICULUM WHEN DETAILS CHANGE
+
+classSelect.addEventListener("change", loadCurriculumTopic);
+
+document.getElementById("subject")
+.addEventListener("change", loadCurriculumTopic);
+
+document.getElementById("term")
+.addEventListener("change", loadCurriculumTopic);
+
+document.getElementById("week")
+.addEventListener("change", loadCurriculumTopic);
+
+// GENERATE AI LESSON
+
+document.getElementById("lessonForm")
+.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const button = document.querySelector(".generate-btn");
+
+    const lessonSection =
+        document.getElementById("generatedLessonSection");
+
+    const lessonOutput =
+        document.getElementById("generatedLesson");
+
+    const lessonDetails = {
+
+        classLevel: classSelect.value,
+
+        subject: document.getElementById("subject").value,
+
+        topic: document.getElementById("topic").value,
+
+        term: document.getElementById("term").value,
+
+        week: document.getElementById("week").value,
+
+        duration: document.getElementById("duration").value,
+
+        subtopics: selectedCurriculum?.subtopics || [],
+
+        learningOutcomes:
+            selectedCurriculum?.learning_outcomes || [],
+
+        curriculumSource:
+            selectedCurriculum?.curriculum_sources?.title || "",
+
+        additionalInfo:
+            document.getElementById("additionalInfo").value
+
+    };
+
+    button.disabled = true;
+    button.textContent = "Generating your lesson...";
+
+    lessonSection.style.display = "none";
+
+    showMessage(
+        "EduCore AI is preparing your lesson. Please wait...",
+        "info"
+    );
+
+    try {
+
+        const { data, error } =
+            await supabaseClient.functions.invoke(
+    "Generate-lesson",
+                {
+                    body: lessonDetails
+                }
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data || !data.success) {
+            throw new Error(
+                data?.error || "Lesson generation failed."
+            );
+        }
+
+        lessonOutput.textContent = data.lesson;
+
+        lessonSection.style.display = "block";
+
+        showMessage(
+            "Your lesson has been generated successfully!",
+            "info"
+        );
+
+    } catch (error) {
+
+        console.error("Lesson generation error:", error);
+
+        showMessage(
+            error.message || "Unable to generate lesson. Please try again.",
+            "error"
+        );
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "✨ Generate Lesson";
+
+    }
+
+});
+
+
+// START
+
+loadTeacher();
+
+</script>
+
+</body>
+</html>

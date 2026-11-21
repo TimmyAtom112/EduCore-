@@ -1,0 +1,313 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Learning Progress | EduCore</title><style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background: #EAF5FF;
+        color: #102A43;
+    }
+
+    header {
+        background: #102A43;
+        color: white;
+        padding: 20px;
+    }
+
+    header h2 {
+        margin-bottom: 5px;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 25px;
+        color: #2196F3;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin: 25px 0;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    }
+
+    .stat-card h3 {
+        font-size: 15px;
+        color: #627D98;
+        margin-bottom: 15px;
+    }
+
+    .stat-card h1 {
+        font-size: 32px;
+        color: #2196F3;
+    }
+
+    .activity-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        margin-top: 25px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    }
+
+    .activity-card h2 {
+        margin-bottom: 15px;
+    }
+
+    .activity-item {
+        padding: 15px 0;
+        border-bottom: 1px solid #E5E7EB;
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-item p {
+        margin-top: 5px;
+        color: #627D98;
+        font-size: 14px;
+    }
+
+    .empty-message {
+        color: #627D98;
+        padding: 15px 0;
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            padding: 15px;
+        }
+
+        .stat-card {
+            padding: 20px;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = "https://xpcumdfehmfbxxycpghg.supabase.co";
+
+    const SUPABASE_KEY = "sb_publishable_D42fTNuZmLQcExVgb9tCmw_wtfnzwc1";
+
+    const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+</script>
+
+</head>
+<body>
+    <header>
+    <h2>EduCore</h2>
+    <p>My Learning Progress</p>
+</header><main class="container"><a href="student-dashboard.html" class="back-link">
+    ← Back to Dashboard
+</a>
+
+<h2>My Learning Overview</h2>
+
+<p>
+    Keep track of your learning activities and academic progress.
+</p>
+
+<section class="stats">
+
+    <div class="stat-card">
+        <h3>📚 Topics Studied</h3>
+        <h1 id="topicsStudied">0</h1>
+    </div>
+
+    <div class="stat-card">
+        <h3>📝 Quizzes Completed</h3>
+        <h1 id="quizzesCompleted">0</h1>
+    </div>
+
+    <div class="stat-card">
+        <h3>🎯 Average Score</h3>
+        <h1 id="averageScore">0%</h1>
+    </div>
+
+</section>
+
+<section class="activity-card">
+
+    <h2>🕒 Recent Learning Activity</h2>
+
+    <div id="recentActivity">
+        <p class="empty-message">
+            Your learning activities will appear here.
+        </p>
+    </div>
+
+</section>
+
+</main>
+
+<script>
+async function loadStudentProgress() {
+
+    // Check logged-in student
+    const { data: { user }, error: authError } =
+        await supabaseClient.auth.getUser();
+
+    if (authError || !user) {
+        window.location.href = "student-auth.html";
+        return;
+    }
+
+    // Confirm student account
+    if (user.user_metadata.account_type !== "student") {
+        await supabaseClient.auth.signOut();
+        window.location.href = "student-auth.html";
+        return;
+    }
+
+    // Count topics studied
+    const { count: topicCount, error: topicError } =
+        await supabaseClient
+            .from("student_topic_progress")
+            .select("id", { count: "exact", head: true })
+            .eq("student_id", user.id);
+
+    if (!topicError) {
+        document.getElementById("topicsStudied").textContent =
+            topicCount || 0;
+    }
+
+    // Load quiz history
+    const { data: quizzes, error: quizError } =
+        await supabaseClient
+            .from("quiz_attempts")
+            .select(`
+                score,
+                total_questions,
+                completed_at,
+                curriculum_topics (
+                    topic,
+                    subject
+                )
+            `)
+            .eq("student_id", user.id)
+            .order("completed_at", { ascending: false });
+
+    if (quizError) {
+        console.error("Quiz history error:", quizError);
+        return;
+    }
+
+    // Display quiz count
+    document.getElementById("quizzesCompleted").textContent =
+        quizzes.length;
+
+    // Calculate overall average percentage
+    const totalScore = quizzes.reduce(
+        (sum, quiz) => sum + quiz.score, 0
+    );
+
+    const totalQuestions = quizzes.reduce(
+        (sum, quiz) => sum + quiz.total_questions, 0
+    );
+
+    const average = totalQuestions > 0
+        ? Math.round((totalScore / totalQuestions) * 100)
+        : 0;
+
+    document.getElementById("averageScore").textContent =
+        average + "%";
+
+    // Load topics studied
+    const { data: topics, error: activityError } =
+        await supabaseClient
+            .from("student_topic_progress")
+            .select(`
+                viewed_at,
+                curriculum_topics (
+                    topic,
+                    subject
+                )
+            `)
+            .eq("student_id", user.id)
+            .order("viewed_at", { ascending: false });
+
+    if (activityError) {
+        console.error("Learning activity error:", activityError);
+        return;
+    }
+
+    // Combine learning activity and quiz history
+    const activities = [];
+
+    topics.forEach(item => {
+        activities.push({
+            type: "Topic studied",
+            title: item.curriculum_topics?.topic || "Learning topic",
+            subject: item.curriculum_topics?.subject || "",
+            date: item.viewed_at
+        });
+    });
+
+    quizzes.forEach(item => {
+        activities.push({
+            type: "Quiz completed",
+            title: item.curriculum_topics?.topic || "Practice quiz",
+            subject: item.curriculum_topics?.subject || "",
+            score: `${item.score}/${item.total_questions}`,
+            date: item.completed_at
+        });
+    });
+
+    activities.sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+    );
+
+    const activityContainer =
+        document.getElementById("recentActivity");
+
+    if (activities.length === 0) {
+        activityContainer.innerHTML =
+            '<p class="empty-message">No learning activities yet. Start studying to see your progress!</p>';
+        return;
+    }
+
+    activityContainer.innerHTML = activities
+        .slice(0, 10)
+        .map(item => `
+            <div class="activity-item">
+                <strong>${item.type}: ${item.title}</strong>
+                <p>${item.subject}</p>
+                ${item.score ? `<p>Score: ${item.score}</p>` : ""}
+                <p>${new Date(item.date).toLocaleString()}</p>
+            </div>
+        `)
+        .join("");
+}
+
+loadStudentProgress();
+</script>
+
+</body>
+</html>

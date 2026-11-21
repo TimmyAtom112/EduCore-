@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Explorer | EduCore</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #EAF5FF;
+            color: #102A43;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #102A43;
+            color: white;
+            padding: 20px;
+        }
+
+        .header-content {
+            max-width: 1000px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header h2 {
+            font-size: 22px;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 35px auto;
+            padding: 0 18px;
+        }
+
+        .intro {
+            margin-bottom: 25px;
+        }
+
+        .intro h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .intro p {
+            color: #52677A;
+            line-height: 1.6;
+        }
+
+        .section-title {
+            margin: 25px 0 15px;
+        }
+
+        #subjects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .subject-card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(16, 42, 67, 0.08);
+            border: 1px solid #D6E8F7;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-3px);
+            border-color: #2196F3;
+        }
+
+        .subject-card h3 {
+            color: #102A43;
+            margin-bottom: 8px;
+        }
+
+        .subject-card p {
+            color: #627D98;
+            font-size: 14px;
+        }
+
+        #topics {
+            margin-top: 25px;
+        }
+
+        .topic-card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .topic-card h3 {
+            margin: 10px 0;
+        }
+
+        .topic-card p {
+            line-height: 1.6;
+            margin: 7px 0;
+        }
+
+        .status {
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            color: #52677A;
+            line-height: 1.6;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2196F3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 500px) {
+            .intro h1 {
+                font-size: 24px;
+            }
+
+            header h2 {
+                font-size: 19px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-content">
+        <h2>EduCore</h2>
+        <a href="student-dashboard.html">← Dashboard</a>
+    </div>
+</header>
+
+<main>
+
+    <section class="intro">
+        <h1>Explore Your Subjects 📚</h1>
+        <p>
+            Discover topics, learning objectives and key areas
+            of study based on your class curriculum.
+        </p>
+        <p id="studentClass"></p>
+    </section>
+
+    <h2 class="section-title">My Subjects</h2>
+
+    <div id="subjects">
+        <div class="status">Loading your subjects...</div>
+    </div>
+
+    <section id="topics">
+    </section>
+
+</main>
+
+<script>
+    const SUPABASE_URL = "https://xpcumdfehmfbxxycpghg.supabase.co";
+
+    const SUPABASE_KEY = "sb_publishable_D42fTNuZmLQcExVgb9tCmw_wtfnzwc1";
+
+    const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+    
+    async function loadStudentProfile() {
+
+    const { data: { user }, error: authError } =
+        await supabaseClient.auth.getUser();
+
+    if (authError || !user) {
+        window.location.href = "student-auth.html";
+        return;
+    }
+
+    if (user.user_metadata.account_type !== "student") {
+        await supabaseClient.auth.signOut();
+        window.location.href = "student-auth.html";
+        return;
+    }
+
+    const { data: profile, error } = await supabaseClient
+        .from("student_profiles")
+        .select("full_name, class_level")
+        .eq("id", user.id)
+        .single();
+
+    if (error || !profile) {
+        document.getElementById("subjects").innerHTML =
+            '<div class="status">Unable to load your student profile.</div>';
+        return;
+    }
+
+    document.getElementById("studentClass").textContent =
+        "Your Class: " + profile.class_level;
+
+    console.log("Student profile loaded:", profile);
+    loadSubjects(profile.class_level);
+}
+loadStudentProfile();
+
+    async function loadSubjects(classLevel) {
+
+    const { data, error } = await supabaseClient
+        .from("curriculum_topics")
+        .select("subject")
+        .eq("class_level", classLevel);
+
+    const subjectsContainer = document.getElementById("subjects");
+
+    if (error) {
+        subjectsContainer.innerHTML =
+            '<div class="status">Unable to load subjects. Please try again.</div>';
+        console.error(error);
+        return;
+    }
+
+    const uniqueSubjects = [...new Set(
+        data.map(item => item.subject)
+    )];
+
+    if (uniqueSubjects.length === 0) {
+        subjectsContainer.innerHTML =
+            '<div class="status">No curriculum subjects are available for your class yet. Check back soon!</div>';
+        return;
+    }
+
+    subjectsContainer.innerHTML = "";
+
+    uniqueSubjects.forEach(subject => {
+
+        const card = document.createElement("div");
+
+        card.className = "subject-card";
+
+        card.innerHTML = `
+            <h3>${subject}</h3>
+            <p>Explore topics and learning objectives.</p>
+        `;
+
+        card.addEventListener("click", () => {
+            loadTopics(classLevel, subject);
+        });
+
+        subjectsContainer.appendChild(card);
+
+    });
+}
+
+async function loadTopics(classLevel, subject) {
+
+    const topicsContainer = document.getElementById("topics");
+
+    topicsContainer.innerHTML =
+        '<div class="status">Loading topics...</div>';
+
+    const { data, error } = await supabaseClient
+        .from("curriculum_topics")
+        .select(`
+            id,
+            topic,
+            term,
+            week,
+            theme,
+            subtopics,
+            learning_outcomes,
+            curriculum_sources (
+                title,
+                issuing_body,
+                source_type
+            )
+        `)
+        .eq("class_level", classLevel)
+        .eq("subject", subject)
+        .order("week");
+
+    if (error) {
+        topicsContainer.innerHTML =
+            '<div class="status">Unable to load topics. Please try again.</div>';
+
+        console.error(error);
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        topicsContainer.innerHTML =
+            '<div class="status">No topics are available for this subject yet.</div>';
+        return;
+    }
+
+    topicsContainer.innerHTML = `
+        <h2 class="section-title">${subject} Topics</h2>
+    `;
+
+    data.forEach(item => {
+
+        const source = item.curriculum_sources;
+
+        let sourceLabel = "Curriculum Source";
+
+        if (source?.source_type === "national_curriculum") {
+            sourceLabel = "National Curriculum";
+        } else if (source?.source_type === "state_scheme") {
+            sourceLabel = "State Scheme of Work";
+        } else if (source?.source_type === "school_scheme") {
+            sourceLabel = "School Scheme of Work";
+        }
+
+        const card = document.createElement("div");
+
+        card.className = "topic-card";
+
+        const title = document.createElement("h3");
+        title.textContent = item.topic;
+
+        const details = document.createElement("p");
+        details.textContent = `${item.term} | Week ${item.week}`;
+
+        const subtopics = document.createElement("p");
+        subtopics.textContent =
+            "Subtopics: " + (item.subtopics || []).join(", ");
+
+        const outcomes = document.createElement("p");
+        outcomes.textContent =
+            "Learning Outcomes: " +
+            (item.learning_outcomes || []).join(" • ");
+
+        const sourceInfo = document.createElement("p");
+        sourceInfo.textContent =
+            `Source: ${sourceLabel}` +
+            (source?.title ? ` — ${source.title}` : "");
+
+        card.append(title, details, subtopics, outcomes, sourceInfo);
+        card.style.cursor = "pointer";
+
+card.addEventListener("click", () => {
+    window.location.href =
+        `topic-learning.html?id=${item.id}`;
+});
+        topicsContainer.appendChild(card);
+
+    });
+
+    topicsContainer.scrollIntoView({
+        behavior: "smooth"
+    });
+}
+
+</script>
+
+</body>
+</html>

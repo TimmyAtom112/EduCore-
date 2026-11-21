@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>EduCore | Empowering Teachers. Inspiring Learners.</title>
+
+<meta name="description" content="EduCore is an AI-powered educational platform helping teachers plan better lessons and students learn beyond the classroom.">
+
+<style>
+
+:root {
+    --navy: #102A43;
+    --blue: #2196F3;
+    --sky: #EAF5FF;
+    --white: #FFFFFF;
+    --text: #334E68;
+    --muted: #627D98;
+    --background: #F7FAFC;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--white);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.container {
+    width: 90%;
+    max-width: 1150px;
+    margin: auto;
+}
+
+/* NAVIGATION */
+
+header {
+    background: white;
+    padding: 18px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 27px;
+    font-weight: 800;
+    color: var(--navy);
+}
+
+.logo span {
+    color: var(--blue);
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.nav-links a {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.nav-links a:hover {
+    color: var(--blue);
+}
+
+.menu-btn {
+    display: none;
+    font-size: 26px;
+    border: none;
+    background: none;
+    color: var(--navy);
+    cursor: pointer;
+}
+
+/* BUTTONS */
+
+.btn {
+    display: inline-block;
+    padding: 13px 24px;
+    border-radius: 7px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-primary {
+    background: var(--blue);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0877d1;
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    border: 1px solid var(--blue);
+    color: var(--blue);
+}
+
+/* HERO */
+
+.hero {
+    background: linear-gradient(120deg, #102A43, #174B72);
+    color: white;
+    padding: 110px 0;
+}
+
+.hero-content {
+    max-width: 750px;
+}
+
+.hero-label {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    padding: 7px 15px;
+    border-radius: 30px;
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+
+.hero h1 {
+    font-size: clamp(38px, 6vw, 62px);
+    line-height: 1.15;
+    margin-bottom: 22px;
+}
+
+.hero h1 span {
+    color: #65C7FF;
+}
+
+.hero p {
+    max-width: 600px;
+    font-size: 17px;
+    color: #D8E8F5;
+    margin-bottom: 32px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.hero .btn-outline {
+    color: white;
+    border-color: white;
+}
+
+/* GENERAL SECTIONS */
+
+section {
+    padding: 85px 0;
+}
+
+.section-heading {
+    text-align: center;
+    max-width: 650px;
+    margin: 0 auto 45px;
+}
+
+.section-heading h2 {
+    font-size: 34px;
+    color: var(--navy);
+    margin-bottom: 12px;
+}
+
+.section-heading p {
+    color: var(--muted);
+}
+
+/* PORTALS */
+
+.portals {
+    background: var(--background);
+}
+
+.portal-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+.portal-card {
+    background: white;
+    padding: 35px;
+    border-radius: 14px;
+    border: 1px solid #E5EDF5;
+    transition: 0.3s;
+}
+
+.portal-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(16,42,67,0.08);
+}
+
+.portal-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--sky);
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+    margin-bottom: 22px;
+}
+
+.portal-card h3 {
+    color: var(--navy);
+    font-size: 23px;
+    margin-bottom: 12px;
+}
+
+.portal-card p {
+    color: var(--muted);
+    margin-bottom: 22px;
+}
+
+.portal-card ul {
+    list-style: none;
+    margin-bottom: 25px;
+}
+
+.portal-card li {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.portal-card li::before {
+    content: "✓";
+    color: var(--blue);
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* FEATURES */
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.feature {
+    padding: 25px;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid #E5EDF5;
+}
+
+.feature h3 {
+    color: var(--navy);
+    margin: 12px 0;
+}
+
+.feature p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.feature-icon {
+    font-size: 28px;
+}
+
+/* BEYOND CLASSROOM */
+
+.beyond {
+    background: var(--sky);
+}
+
+.beyond-content {
+    max-width: 750px;
+    margin: auto;
+    text-align: center;
+}
+
+.beyond h2 {
+    font-size: 35px;
+    color: var(--navy);
+    margin-bottom: 18px;
+}
+
+.beyond p {
+    color: var(--text);
+    margin-bottom: 25px;
+}
+
+/* ABOUT */
+
+.about-content {
+    max-width: 750px;
+    margin: auto;
+    text-align: center;
+}
+
+.about-content h2 {
+    color: var(--navy);
+    font-size: 34px;
+    margin-bottom: 20px;
+}
+
+/* CTA */
+
+.cta {
+    background: var(--navy);
+    color: white;
+    text-align: center;
+}
+
+.cta h2 {
+    font-size: 35px;
+    margin-bottom: 15px;
+}
+
+.cta p {
+    color: #D8E8F5;
+    margin-bottom: 25px;
+}
+
+/* FOOTER */
+
+footer {
+    background: #0B1F33;
+    color: white;
+    padding: 35px 0;
+    text-align: center;
+}
+
+footer p {
+    font-size: 13px;
+    color: #B7C9D9;
+    margin-top: 10px;
+}
+
+/* MOBILE */
+
+@media(max-width: 768px) {
+
+    .menu-btn {
+        display: block;
+    }
+
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: white;
+        flex-direction: column;
+        padding: 25px;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.08);
+    }
+
+    .nav-links.active {
+        display: flex;
+    }
+
+    .hero {
+        padding: 85px 0;
+    }
+
+    .portal-grid,
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-heading h2,
+    .beyond h2,
+    .about-content h2 {
+        font-size: 28px;
+    }
+
+    .portal-card {
+        padding: 25px;
+    }
+
+    section {
+        padding: 65px 0;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVIGATION -->
+
+<header>
+<div class="container">
+<nav>
+
+<a href="#" class="logo">Edu<span>Core</span></a>
+
+<button class="menu-btn" id="menuBtn">☰</button>
+
+<div class="nav-links" id="navLinks">
+<a href="#home">Home</a>
+<a href="#teachers">For Teachers</a>
+<a href="#students">For Students</a>
+<a href="#about">About Us</a>
+<a href="#get-started" class="btn btn-primary">Get Started</a>
+</div>
+
+</nav>
+</div>
+</header>
+
+
+<!-- HERO -->
+
+<section class="hero" id="home">
+
+<div class="container">
+<div class="hero-content">
+
+<span class="hero-label">
+AI-Powered Education Platform
+</span>
+
+<h1>
+Empowering Teachers.<br>
+<span>Inspiring Learners.</span>
+</h1>
+
+<p>
+Discover a smarter approach to education.
+EduCore helps teachers prepare better lessons
+and empowers students to explore knowledge,
+understand difficult subjects and learn beyond
+the classroom.
+</p>
+
+<a href="teacher-auth.html" class="btn btn-primary">
+I'm a Teacher
+</a>
+
+<a href="#students" class="btn btn-outline">
+I'm a Student
+</a>
+</div>
+
+</div>
+</div>
+
+</section>
+
+
+<!-- PORTALS -->
+
+<section class="portals">
+
+<div class="container">
+
+<div class="section-heading">
+<h2>One Platform. Two Powerful Experiences.</h2>
+<p>
+Whether you're teaching or learning, EduCore
+provides intelligent tools to help you achieve more.
+</p>
+</div>
+
+<div class="portal-grid">
+
+<div class="portal-card" id="teachers">
+
+<div class="portal-icon">👨‍🏫</div>
+
+<h3>EduCore Teacher</h3>
+
+<p>
+Spend less time preparing lessons and more time
+inspiring students.
+</p>
+
+<ul>
+<li>AI-powered lesson planning</li>
+<li>Scheme of work integration</li>
+<li>Structured lesson notes</li>
+<li>Classroom activities and evaluations</li>
+<li>Downloadable lesson materials</li>
+</ul>
+
+<a href="teacher-auth.html" class="btn btn-primary">
+Explore Teacher AI
+</a>
+
+</div>
+
+
+<div class="portal-card" id="students">
+
+<div class="portal-icon">🎓</div>
+
+<h3>EduCore Student</h3>
+
+<p>
+Your personal AI tutor, available to help you
+understand, discover and grow.
+</p>
+
+<ul>
+<li>Personalised AI tutoring</li>
+<li>Step-by-step explanations</li>
+<li>Practice questions and quizzes</li>
+<li>Explore subjects beyond school</li>
+<li>Learn at your own pace</li>
+</ul>
+
+<a href="student-auth.html" class="btn btn-primary">
+    Explore Student AI
+</a>
+
+</div>
+
+</div>
+</div>
+
+</section>
+
+
+<!-- FEATURES -->
+
+<section>
+
+<div class="container">
+
+<div class="section-heading">
+<h2>Learning Made Smarter</h2>
+<p>
+Discover how artificial intelligence can
+transform everyday teaching and learning.
+</p>
+</div>
+
+<div class="feature-grid">
+
+<div class="feature">
+<div class="feature-icon">📚</div>
+<h3>Smart Lesson Planning</h3>
+<p>
+Create organised, comprehensive lesson notes
+with the assistance of AI.
+</p>
+</div>
+
+<div class="feature">
+<div class="feature-icon">🧠</div>
+<h3>Intelligent Tutoring</h3>
+<p>
+Get clear explanations and personalised
+academic support whenever you need it.
+</p>
+</div>
+
+<div class="feature">
+<div class="feature-icon">💡</div>
+<h3>Independent Learning</h3>
+<p>
+Explore new ideas, develop skills and
+discover knowledge beyond your curriculum.
+</p>
+</div>
+
+</div>
+</div>
+
+</section>
+
+
+<!-- BEYOND CLASSROOM -->
+
+<section class="beyond">
+
+<div class="container">
+
+<div class="beyond-content">
+
+<h2>Education Beyond the Classroom</h2>
+
+<p>
+Learning should never be limited to what is taught
+in school. With EduCore, students can explore
+technology, financial literacy, entrepreneurship,
+creativity, critical thinking and much more.
+</p>
+
+<a href="#students" class="btn btn-primary">
+Discover More
+</a>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ABOUT -->
+
+<section id="about">
+
+<div class="container">
+
+<div class="about-content">
+
+<h2>Our Vision</h2>
+
+<p>
+At EduCore, we believe that quality education
+should be accessible, engaging and empowering.
+
+Our mission is to support teachers with
+intelligent teaching tools while giving students
+the confidence and resources to become
+independent learners.
+
+We are building a future where technology
+strengthens education and creates opportunities
+for everyone.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- CTA -->
+
+<section class="cta" id="get-started">
+
+<div class="container">
+
+<h2>Ready to Experience Smarter Education?</h2>
+
+<p>
+Join us as we redefine teaching and learning
+through artificial intelligence.
+</p>
+
+<a href="#home" class="btn btn-primary">
+Discover EduCore
+</a>
+
+</div>
+
+</section>
+
+
+<!-- FOOTER -->
+
+<footer>
+
+<div class="container">
+
+<h2>Edu<span style="color:#65C7FF">Core</span></h2>
+
+<p>Empowering Teachers. Inspiring Learners.</p>
+
+<p>
+© <span id="year"></span> EduCore.
+All rights reserved.
+</p>
+
+</div>
+
+</footer>
+
+
+<script>
+
+// MOBILE MENU
+
+const menuBtn = document.getElementById("menuBtn");
+const navLinks = document.getElementById("navLinks");
+
+menuBtn.addEventListener("click", () => {
+    navLinks.classList.toggle("active");
+
+    menuBtn.textContent =
+        navLinks.classList.contains("active") ? "✕" : "☰";
+});
+
+// CLOSE MENU AFTER CLICK
+
+document.querySelectorAll(".nav-links a").forEach(link => {
+    link.addEventListener("click", () => {
+        navLinks.classList.remove("active");
+        menuBtn.textContent = "☰";
+    });
+});
+
+// AUTOMATIC COPYRIGHT YEAR
+
+document.getElementById("year").textContent =
+    new Date().getFullYear();
+
+</script>
+
+</body>
+</html>
