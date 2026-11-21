@@ -835,6 +835,9 @@ async function loadConversationHistory() {
         const item = document.createElement("div");
         item.className = "conversation-item";
 
+        const details = document.createElement("div");
+        details.className = "conversation-details";
+
         const title = document.createElement("strong");
         title.textContent = conversation.title;
 
@@ -842,8 +845,55 @@ async function loadConversationHistory() {
         date.textContent =
             new Date(conversation.created_at).toLocaleString();
 
-        item.appendChild(title);
-        item.appendChild(date);
+        details.appendChild(title);
+        details.appendChild(date);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "🗑️";
+        deleteButton.className = "delete-conversation";
+        deleteButton.title = "Delete conversation";
+
+        deleteButton.addEventListener("click", async (event) => {
+
+            event.stopPropagation();
+
+            const confirmed = confirm(
+                "Are you sure you want to permanently delete this conversation and its messages?"
+            );
+
+            if (!confirmed) return;
+
+            const { error } = await supabaseClient
+                .from("tutor_conversations")
+                .delete()
+                .eq("id", conversation.id)
+                .eq("student_id", currentStudentId);
+
+            if (error) {
+                alert("Could not delete conversation. Please try again.");
+                console.error(error);
+                return;
+            }
+
+            if (currentConversationId === conversation.id) {
+                currentConversationId = null;
+
+                chatMessages.innerHTML = `
+                    <div class="tutor-message">
+                        <strong>EduCore Tutor</strong>
+                        <p>This conversation has been deleted. Start a new learning session whenever you're ready! 👋</p>
+                    </div>
+                `;
+
+                studentQuestion.value = "";
+            }
+
+            await loadConversationHistory();
+
+        });
+
+        item.appendChild(details);
+        item.appendChild(deleteButton);
 
         item.addEventListener("click", () => {
             openConversation(conversation.id);
