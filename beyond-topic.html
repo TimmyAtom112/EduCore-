@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Topic | EduCore</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f8fc;
+            color: #102A43;
+            line-height: 1.7;
+        }
+
+        header {
+            background: #102A43;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #102A43, #2196F3);
+            color: white;
+            padding: 45px 6%;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .learning-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .learning-card h2 {
+            margin-bottom: 15px;
+        }
+
+        .learning-card ul {
+            padding-left: 22px;
+        }
+
+        .learning-card li {
+            margin-bottom: 9px;
+        }
+
+        .difficulty {
+            display: inline-block;
+            background: #EAF5FF;
+            color: #1769aa;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .ai-btn {
+            display: inline-block;
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 13px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .ai-btn:hover {
+            background: #1476c9;
+        }
+
+        footer {
+            background: #102A43;
+            color: white;
+            text-align: center;
+            padding: 22px;
+            margin-top: 50px;
+        }
+
+        @media(max-width: 600px) {
+            .hero h1 {
+                font-size: 24px;
+            }
+
+            .learning-card {
+                padding: 19px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>EduCore</h2>
+    <a href="technology-learning.html">← Back to Topics</a>
+</header>
+
+<section class="hero">
+    <h1 id="topicTitle">Loading Topic...</h1>
+    <p id="topicDescription">Preparing your learning experience.</p>
+    <span class="difficulty" id="topicDifficulty"></span>
+</section>
+
+<main class="container">
+
+    <section class="learning-card">
+        <h2>🎯 What You Will Learn</h2>
+        <ul id="learningObjectives">
+            <li>Loading learning objectives...</li>
+        </ul>
+    </section>
+
+    <section class="learning-card">
+        <h2>📚 Explore the Subtopics</h2>
+        <ul id="subtopics">
+            <li>Loading subtopics...</li>
+        </ul>
+    </section>
+
+    <section class="learning-card">
+        <h2>🤖 Learn with EduCore AI</h2>
+        <p>
+            Let EduCore create a clear, personalised lesson
+            to help you understand this topic.
+        </p>
+
+        <button class="ai-btn" id="generateLessonBtn">
+            ✨ Generate AI Lesson
+        </button>
+
+        <div id="lessonOutput" style="margin-top:20px;">
+
+    <div id="lessonPlaceholder"
+         style="background:#EAF5FF; padding:20px; border-radius:10px; margin-top:15px;">
+
+        <h3>📖 Your Learning Space</h3>
+
+        <p>
+            Your personalised lesson will appear here
+            after you select Generate AI Lesson.
+        </p>
+
+    </div>
+
+</div>
+
+    </section>
+
+    
+<section class="learning-card">
+    <h2>💬 Ask EduCore AI Tutor</h2>
+
+    <p>
+        Have a question about what you're learning?
+        Ask EduCore AI Tutor for a simpler explanation
+        or more examples.
+    </p>
+
+    <div style="margin-top:20px;">
+
+        <textarea
+            id="tutorQuestion"
+            placeholder="Type your question here..."
+            rows="4"
+            style="width:100%; padding:14px; border:1px solid #cbd5e1; border-radius:8px; font-family:Arial; font-size:15px; resize:vertical;">
+        </textarea>
+
+        <button class="ai-btn" id="askTutorBtn">
+            Send Question →
+        </button>
+
+    </div>
+
+    <div id="tutorResponse" style="margin-top:20px;"></div>
+
+</section>
+
+
+
+</main>
+
+<footer>
+    <p>© 2026 EduCore. Empowering Teachers. Inspiring Learners.</p>
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://xpcumdfehmfbxxycpghg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_D42fTNuZmLQcExVgb9tCmw_wtfnzwc1";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+async function loadTopic() {
+    const params = new URLSearchParams(window.location.search);
+    const topicId = params.get("id");
+
+    if (!topicId) {
+        document.getElementById("topicTitle").textContent =
+            "Topic not found";
+        document.getElementById("topicDescription").textContent =
+            "Please return and select a topic.";
+        return;
+    }
+
+    const { data: authData, error: authError } =
+        await supabaseClient.auth.getUser();
+
+    const user = authData?.user;
+
+    if (authError || !user) {
+        window.location.href = "student-auth.html";
+        return;
+    }
+
+    if (user.user_metadata?.account_type !== "student") {
+        await supabaseClient.auth.signOut();
+        window.location.href = "student-auth.html";
+        return;
+    }
+
+    const { data: topic, error } = await supabaseClient
+        .from("beyond_classroom_topics")
+        .select("*")
+        .eq("id", topicId)
+        .eq("category", "Technology & Digital Skills")
+        .single();
+
+    if (error || !topic) {
+        document.getElementById("topicTitle").textContent =
+            "Unable to load topic";
+        document.getElementById("topicDescription").textContent =
+            "Please return to the topics page and try again.";
+        console.error(error);
+        return;
+    }
+
+    document.getElementById("topicTitle").textContent = topic.title;
+    document.getElementById("topicDescription").textContent =
+        topic.description || "";
+    document.getElementById("topicDifficulty").textContent =
+        topic.difficulty || "Beginner";
+
+    const objectives = document.getElementById("learningObjectives");
+    objectives.innerHTML = "";
+
+    (topic.learning_objectives || []).forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        objectives.appendChild(li);
+    });
+
+    const subtopics = document.getElementById("subtopics");
+    subtopics.innerHTML = "";
+
+    (topic.subtopics || []).forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        subtopics.appendChild(li);
+    });
+}
+
+loadTopic();
+
+
+document.getElementById("generateLessonBtn").addEventListener("click", function () {
+
+    const output = document.getElementById("lessonOutput");
+    const button = document.getElementById("generateLessonBtn");
+
+    button.disabled = true;
+    button.textContent = "Preparing lesson...";
+
+    const topicTitle = document.getElementById("topicTitle").textContent;
+
+    output.innerHTML = `
+        <div class="learning-card" style="margin-top:20px;">
+
+            <h2>📖 ${topicTitle}</h2>
+
+            <h3>1. Introduction</h3>
+            <p>
+                EduCore will introduce this topic using simple,
+                student-friendly language.
+            </p>
+
+            <h3>2. Detailed Explanation</h3>
+            <p>
+                The topic will be explained step by step,
+                with clear definitions and examples.
+            </p>
+
+            <h3>3. Everyday Nigerian Examples</h3>
+            <p>
+                The lesson will connect what you learn
+                to familiar situations in everyday Nigerian life.
+            </p>
+
+            <h3>4. Key Points to Remember</h3>
+            <p>
+                Important ideas will be summarised
+                for easy understanding.
+            </p>
+
+            <h3>5. Conclusion</h3>
+            <p>
+                A short recap will help you remember
+                what you have learned.
+            </p>
+
+            <p style="margin-top:20px; color:#64748b;">
+                This is a preview. AI lesson generation
+                will be connected when API credits are available.
+            </p>
+
+        </div>
+    `;
+
+    button.disabled = false;
+    button.textContent = "✨ Generate AI Lesson";
+
+});
+    
+document.getElementById("askTutorBtn").addEventListener("click", function () {
+
+    const question = document.getElementById("tutorQuestion").value.trim();
+    const response = document.getElementById("tutorResponse");
+
+    if (!question) {
+        response.textContent = "Please enter a question first.";
+        return;
+    }
+
+    response.innerHTML = `
+        <div style="background:#EAF5FF; padding:16px; border-radius:10px;">
+            <strong>Your question:</strong>
+            <p></p>
+            <p style="margin-top:12px; color:#64748b;">
+                EduCore AI Tutor connection is being prepared.
+                Your question will be answered when the AI service
+                is connected.
+            </p>
+        </div>
+    `;
+
+    response.querySelector("p").textContent = question;
+
+});
+
+</script>
+
+</body>
+</html>
