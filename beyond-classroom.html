@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Beyond the Classroom | EduCore</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #F4F8FC;
+    color: #102A43;
+}
+
+header {
+    background: #102A43;
+    color: white;
+    padding: 18px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.logo {
+    font-size: 23px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #2196F3;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1150px;
+    margin: auto;
+}
+
+.hero {
+    background: linear-gradient(120deg, #102A43, #2196F3);
+    color: white;
+    padding: 65px 30px;
+    margin-top: 30px;
+    border-radius: 16px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 34px;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    max-width: 650px;
+    margin: auto;
+    line-height: 1.7;
+    font-size: 16px;
+}
+
+.section-heading {
+    margin: 45px 0 10px;
+    font-size: 25px;
+}
+
+.section-description {
+    color: #64748B;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin-bottom: 50px;
+}
+
+.category-card {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid #E2E8F0;
+    transition: 0.3s;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.09);
+}
+
+.category-icon {
+    font-size: 38px;
+    margin-bottom: 15px;
+}
+
+.category-card h3 {
+    font-size: 19px;
+    margin-bottom: 10px;
+}
+
+.category-card p {
+    color: #64748B;
+    line-height: 1.6;
+    font-size: 14px;
+    min-height: 68px;
+}
+
+.levels {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    margin-top: 17px;
+}
+
+.level {
+    background: #EAF5FF;
+    color: #1769AA;
+    padding: 6px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+}
+
+.explore-btn {
+    display: inline-block;
+    margin-top: 20px;
+    background: #2196F3;
+    color: white;
+    padding: 11px 17px;
+    border-radius: 7px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.explore-btn:hover {
+    background: #1478C9;
+}
+
+.info-section {
+    background: #EAF5FF;
+    padding: 30px;
+    border-radius: 14px;
+    margin-bottom: 45px;
+    text-align: center;
+}
+
+.info-section h2 {
+    margin-bottom: 12px;
+}
+
+.info-section p {
+    color: #486581;
+    line-height: 1.7;
+}
+
+footer {
+    background: #102A43;
+    color: white;
+    text-align: center;
+    padding: 25px 15px;
+    font-size: 13px;
+}
+
+@media(max-width: 850px) {
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 550px) {
+    header {
+        padding: 16px 5%;
+    }
+
+    .hero {
+        padding: 45px 20px;
+    }
+
+    .hero h1 {
+        font-size: 27px;
+    }
+
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .category-card p {
+        min-height: auto;
+    }
+
+    .section-heading {
+        font-size: 22px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Edu<span>Core</span></div>
+
+    <a href="student-dashboard.html">← Back to Dashboard</a>
+</header>
+
+<main class="container">
+
+    <section class="hero">
+        <h1>🌍 Beyond the Classroom</h1>
+
+        <p>
+            Learn beyond textbooks. Discover new interests,
+            develop practical skills, explore the world around
+            you and prepare for opportunities beyond school.
+        </p>
+    </section>
+
+    <h2 class="section-heading">Explore Your Interests</h2>
+
+    <p class="section-description">
+        Choose an area that interests you. There are no class
+        restrictions. Learn at your own pace and discover
+        something new every day.
+    </p>
+
+    <section class="category-grid">
+
+        <div class="category-card">
+            <div class="category-icon">💻</div>
+            <h3>Technology & Digital Skills</h3>
+            <p>
+                Explore coding, artificial intelligence,
+                web development, robotics, cybersecurity
+                and digital creativity.
+            </p>
+            <div class="levels">
+                <span class="level">Beginner</span>
+                <span class="level">Intermediate</span>
+                <span class="level">Advanced</span>
+            </div>
+            <a href="#" class="explore-btn">Explore Category</a>
+        </div>
+
+        <div class="category-card">
+            <div class="category-icon">💰</div>
+            <h3>Financial Literacy</h3>
+            <p>
+                Understand money, saving, budgeting,
+                responsible spending and financial decisions.
+            </p>
+            <div class="levels">
+                <span class="level">Beginner</span>
+                <span class="level">Intermediate</span>
+                <span class="level">Advanced</span>
+            </div>
+            <a href="#" class="explore-btn">Explore Category</a>
+        </div>
+
+        <div class="category-card">
+            <div class="category-icon">🚀</div>
+            <h3>Entrepreneurship & Business</h3>
+            <p>
+                Discover business ideas, innovation,
+                branding, marketing and entrepreneurship.
+            </p>
+            <div class="levels">
+                <span class="level">Beginner</span>
+                <span class="level">Intermediate</span>
+                <span class="level">Advanced</span>
+            </div>
+            <a href="#" class="explore-btn">Explore Category</a>
+        </div>
+
+        <div class="category-card">
+            <div class="category-icon">🧠</div>
+            <h3>Critical Thinking & Personal Development</h3>
+            <p>
+                Improve communication, leadership,
+                creativity, confidence and problem-solving.
+            </p>
+            <div class="levels">
+                <span class="level">Beginner</span>
+                <span class="level">Intermediate</span>
+                <span class="level">Advanced</span>
+            </div>
+            <a href="#" class="explore-btn">Explore Category</a>
+        </div>
+
+        <div class="category-card">
+            <div class="category-icon">🌱</div>
+            <h3>Life Skills & Society</h3>
+            <p>
+                Learn practical everyday skills, health
+                awareness, civic responsibility and
+                environmental care.
+            </p>
+            <div class="levels">
+                <span class="level">Beginner</span>
+                <span class="level">Intermediate</span>
+                <span class="level">Advanced</span>
+            </div>
+            <a href="#" class="explore-btn">Explore Category</a>
+        </div>
+
+        <div class="category-card">
+            <div class="category-icon">🌍</div>
+            <h3>African History & Culture</h3>
+            <p>
+                Explore African civilizations, Nigerian
+                history, cultural heritage and influential
+                historical figures.
+            </p>
+            <div class="levels">
+                <span class="level">Beginner</span>
+                <span class="level">Intermediate</span>
+                <span class="level">Advanced</span>
+            </div>
+            <a href="#" class="explore-btn">Explore Category</a>
+        </div>
+
+    </section>
+
+    <section class="info-section">
+        <h2>✨ Your Learning Journey Has No Limits</h2>
+
+        <p>
+            Whether you want to become a programmer,
+            entrepreneur, creative thinker or simply
+            understand the world better, EduCore gives
+            you room to explore, learn and grow.
+        </p>
+    </section>
+
+</main>
+
+<footer>
+    <p>© 2026 EduCore. Empowering Teachers. Inspiring Learners.</p>
+</footer>
+
+<script>
+const SUPABASE_URL = "https://xpcumdfehmfbxxycpghg.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_D42fTNuZmLQcExVgb9tCmw_wtfnzwc1";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+async function checkStudentAccess() {
+
+    const { data, error } =
+        await supabaseClient.auth.getUser();
+
+    if (error || !data.user) {
+        window.location.href = "student-auth.html";
+        return;
+    }
+
+    if (data.user.user_metadata.account_type !== "student") {
+        await supabaseClient.auth.signOut();
+        window.location.href = "student-auth.html";
+        return;
+    }
+}
+
+checkStudentAccess();
+</script>
+
+</body>
+</html>
