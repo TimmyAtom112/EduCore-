@@ -626,7 +626,7 @@
 
     </main>
     
-<script>
+
 const chatMessages = document.getElementById("chatMessages");
 const studentQuestion = document.getElementById("studentQuestion");
 const sendQuestion = document.getElementById("sendQuestion");
@@ -635,138 +635,196 @@ const sendQuestion = document.getElementById("sendQuestion");
 let currentConversationId = null;
 let currentStudentId = null;
 
-// STORE SELECTED CURRICULUM CONTEXT
+// SELECTED CURRICULUM CONTEXT
 let selectedCurriculumContext = null;
 
-if (!question) {
+
+// SEND MESSAGE
+async function sendMessage() {
+
+    const question = studentQuestion.value.trim();
+
+    if (!question) {
         alert("Please enter a question first.");
         return;
     }
-    // CREATE A NEW CONVERSATION
-if (!currentConversationId) {
 
-    const { data: conversation, error } =
-        await supabaseClient
-            .from("tutor_conversations")
-            .insert({
-                student_id: currentStudentId,
-                title: question.substring(0, 60)
-            })
-            .select()
-            .single();
-
-    if (error) {
-        console.error("Conversation error:", error);
-        alert("Could not start conversation. Please try again.");
+    if (!currentStudentId) {
+        alert("Your student profile is still loading. Please try again.");
         return;
     }
 
-    currentConversationId = conversation.id;
+    const tutorRequest = {
+        question: question,
+        class_level: document.getElementById("tutorClass").value,
+        subject: document.getElementById("tutorSubject").value,
+        learning_mode:
+            document.querySelector(".mode-btn.active")?.dataset.mode || "explain",
+        curriculum_context: selectedCurriculumContext
+    };
+
+    // PREVENT MULTIPLE SIMULTANEOUS REQUESTS
+    sendQuestion.disabled = true;
+    sendQuestion.textContent = "Sending...";
+
+    let typingIndicator = null;
+
+    try {
+
+        // CREATE NEW CONVERSATION IF NECESSARY
+        if (!currentConversationId) {
+
+            const { data: conversation, error } =
+                await supabaseClient
+                    .from("tutor_conversations")
+                    .insert({
+                        student_id: currentStudentId,
+                        title: question.substring(0, 60)
+                    })
+                    .select()
+                    .single();
+
+            if (error) throw error;
+
+            currentConversationId = conversation.id;
+            await loadConversationHistory();
+        }
+
+        // DISPLAY STUDENT MESSAGE
+        const studentBubble = document.createElement("div");
+        studentBubble.className = "student-message";
+        studentBubble.textContent = question;
+
+        chatMessages.appendChild(studentBubble);
+
+        studentQuestion.value = "";
+
+        // SAVE STUDENT MESSAGE
+        const { error: studentMessageError } =
+            await supabaseClient
+                .from("tutor_messages")
+                .insert({
+                    conversation_id: currentConversationId,
+                    role: "student",
+                    content: question
+                });
+
+        if (studentMessageError) throw studentMessageError;
+
+        // SHOW TYPING INDICATOR
+        typingIndicator = document.createElement("div");
+        typingIndicator.className = "typing-indicator";
+
+        const typingText = document.createElement("strong");
+        typingText.textContent = "EduCore Tutor is thinking";
+
+        typingIndicator.appendChild(typingText);
+
+        for (let i = 0; i < 3; i++) {
+            const dot = document.createElement("span");
+            typingIndicator.appendChild(dot);
+        }
+
+        chatMessages.appendChild(typingIndicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // CONTACT BACKEND
+        const backendResult = await sendTutorRequest(tutorRequest);
+
+        // REMOVE TYPING INDICATOR
+        typingIndicator.remove();
+        typingIndicator = null;
+
+        // PREPARE TEMPORARY TUTOR RESPONSE
+        const tutorBubble = document.createElement("div");
+        tutorBubble.className = "tutor-message";
+
+        const tutorName = document.createElement("strong");
+        tutorName.textContent = "EduCore Tutor";
+
+        const tutorText = document.createElement("p");
+
+        const responses = {
+            explain:
+                "I'll help you understand this topic step by step, using simple explanations and examples.",
+
+            question:
+                "I'll help you find a clear answer to your question and explain the important details.",
+
+            practice:
+                "I'll prepare practice questions to test your understanding, with answers and explanations."
+        };
+
+        let responseText = responses[tutorRequest.learning_mode];
+
+        if (tutorRequest.curriculum_context) {
+            responseText +=
+                " Your selected learning topic is " +
+                tutorRequest.curriculum_context.topic + ".";
+        }
+
+        if (backendResult) {
+            responseText +=
+                " Your request has successfully reached EduCore's secure backend.";
+        } else {
+            responseText +=
+                " We couldn't connect to the learning service. Please try again.";
+        }
+
+        responseText +=
+            " Real AI-generated answers will be activated when API credit is available.";
+
+        tutorText.textContent = responseText;
+
+        tutorBubble.appendChild(tutorName);
+        tutorBubble.appendChild(tutorText);
+
+        chatMessages.appendChild(tutorBubble);
+
+        // SAVE TUTOR RESPONSE
+        const { error: tutorMessageError } =
+            await supabaseClient
+                .from("tutor_messages")
+                .insert({
+                    conversation_id: currentConversationId,
+                    role: "tutor",
+                    content: tutorText.textContent
+                });
+
+        if (tutorMessageError) {
+            console.error("Tutor message error:", tutorMessageError);
+        }
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    } catch (error) {
+
+        console.error("Send message error:", error);
+
+        alert("Something went wrong while sending your message. Please try again.");
+
+    } finally {
+
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+
+        sendQuestion.disabled = false;
+        sendQuestion.textContent = "Send Message";
+    }
 }
 
-    // Display student's message
-    const studentBubble = document.createElement("div");
-    studentBubble.className = "student-message";
-    studentBubble.textContent = question;
 
-    chatMessages.appendChild(studentBubble);
-    // SAVE STUDENT MESSAGE
-const { error: studentMessageError } =
-    await supabaseClient
-        .from("tutor_messages")
-        .insert({
-            conversation_id: currentConversationId,
-            role: "student",
-            content: question
-        });
-
-if (studentMessageError) {
-    console.error("Student message error:", studentMessageError);
-    alert("Your message could not be saved. Please try again.");
-    return;
-}
-    studentQuestion.value = "";
-    // SEND REQUEST TO EDCORE BACKEND
-const backendResult = await sendTutorRequest(tutorRequest);
-
-    
-// Temporary tutor response
-const tutorBubble = document.createElement("div");
-tutorBubble.className = "tutor-message";
-
-const tutorName = document.createElement("strong");
-tutorName.textContent = "EduCore Tutor";
-
-const tutorText = document.createElement("p");
-
-const mode = tutorRequest.learning_mode;
-const selectedClass = tutorRequest.class_level;
-const selectedSubject = tutorRequest.subject;
-const selectedTopic = tutorRequest.curriculum_context;
-
-const responses = {
-    explain:
-        "I'll help you understand this topic step by step, using simple explanations and examples.",
-
-    question:
-        "I'll help you find a clear answer to your question and explain the important details.",
-
-    practice:
-        "I'll prepare practice questions to test your understanding, with answers and explanations."
-};
-
-let responseText = responses[mode];
-
-if (selectedTopic) {
-    responseText +=
-        " Your selected learning topic is " +
-        selectedTopic.topic + ".";
-}
-
-if (backendResult) {
-    responseText +=
-        " Your request has successfully reached EduCore's secure backend.";
-} else {
-    responseText +=
-        " We couldn't connect to the learning service. Please try again.";
-}
-
-responseText +=
-    " Real AI-generated answers will be activated when API credit is available.";
-tutorText.textContent = responseText;
-
-tutorBubble.appendChild(tutorName);
-tutorBubble.appendChild(tutorText);
-
-chatMessages.appendChild(tutorBubble);
-
-    // SAVE TUTOR RESPONSE
-const { error: tutorMessageError } =
-    await supabaseClient
-        .from("tutor_messages")
-        .insert({
-            conversation_id: currentConversationId,
-            role: "tutor",
-            content: tutorText.textContent
-        });
-
-if (tutorMessageError) {
-    console.error("Tutor message error:", tutorMessageError);
-}
-
-    // Scroll to latest message
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-
+// SEND REQUEST TO SUPABASE EDGE FUNCTION
 async function sendTutorRequest(tutorRequest) {
 
-    const { data, error } = await supabaseClient.functions.invoke(
-        "Student-Tutor",
-        {
-            body: tutorRequest
-        }
-    );
+    const { data, error } =
+        await supabaseClient.functions.invoke(
+            "Student-Tutor",
+            {
+                body: tutorRequest
+            }
+        );
 
     if (error) {
         console.error("Tutor backend error:", error);
@@ -777,51 +835,23 @@ async function sendTutorRequest(tutorRequest) {
 }
 
 
-sendQuestion.onclick = function(event) {
+// SEND BUTTON EVENT
+sendQuestion.addEventListener("click", function(event) {
     event.preventDefault();
     sendMessage();
-};
+});
 
-// Allow Enter to send, Shift + Enter for a new line
+
+// ENTER TO SEND, SHIFT + ENTER FOR NEW LINE
 studentQuestion.addEventListener("keydown", function(event) {
+
     if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
         sendMessage();
     }
+
 });
 
-
-async function sendTutorRequest(tutorRequest) {
-
-    const { data, error } = await supabaseClient.functions.invoke(
-        "Student-Tutor",
-        {
-            body: tutorRequest
-        }
-    );
-
-    if (error) {
-        console.error("Tutor backend error:", error);
-        return null;
-    }
-
-    return data;
-}
-
-
-sendQuestion.onclick = function(event) {
-    event.preventDefault();
-    alert("Send button is responding!");
-};
-
-// Allow Enter to send, Shift + Enter for a new line
-studentQuestion.addEventListener("keydown", function(event) {
-    if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        sendMessage();
-    }
-});
-</script>
 
 <script>
 async function loadTutorProfile() {
