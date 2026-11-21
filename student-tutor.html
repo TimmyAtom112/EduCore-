@@ -383,7 +383,31 @@
 .context-section ul {
     padding-left: 22px;
 }
+.conversation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
 
+.conversation-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.delete-conversation {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 12px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.delete-conversation:hover {
+    background: #fecaca;
+}
     </style>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
